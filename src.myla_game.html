@@ -1,0 +1,1541 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="ja" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.myla_game package &mdash; myla_game 1.6 ドキュメント</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=044f9cdb"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/translations.js?v=4755f45a"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="genindex.html" />
+    <link rel="search" title="検索" href="search.html" />
+    <link rel="next" title="src.utils package" href="src.utils.html" />
+    <link rel="prev" title="src.cog package" href="src.cog.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            myla_game
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="src.html">src package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="src.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="src.cog.html">src.cog package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">src.myla_game package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-src.myla_game.action_data">src.myla_game.action_data module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-src.myla_game.action_type">src.myla_game.action_type module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-src.myla_game.battle">src.myla_game.battle module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-src.myla_game.character">src.myla_game.character module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-src.myla_game.effect">src.myla_game.effect module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-src.myla_game.effect_type">src.myla_game.effect_type module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-src.myla_game.element">src.myla_game.element module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-src.myla_game.job">src.myla_game.job module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-src.myla_game.myla_game">src.myla_game.myla_game module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-src.myla_game.party">src.myla_game.party module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-src.myla_game.skill">src.myla_game.skill module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-src.myla_game.skill_data">src.myla_game.skill_data module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-src.myla_game.status">src.myla_game.status module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-src.myla_game.stone">src.myla_game.stone module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-src.myla_game.trigger_type">src.myla_game.trigger_type module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-src.myla_game.utils">src.myla_game.utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-src.myla_game.weapon">src.myla_game.weapon module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-src.myla_game">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="src.utils.html">src.utils package</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#module-src.cogs">src.cogs module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.html#module-src">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">myla_game</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="src.html">src package</a></li>
+      <li class="breadcrumb-item active">src.myla_game package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/src.myla_game.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="src-myla-game-package">
+<h1>src.myla_game package<a class="headerlink" href="#src-myla-game-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-src.myla_game.action_data">
+<span id="src-myla-game-action-data-module"></span><h2>src.myla_game.action_data module<a class="headerlink" href="#module-src.myla_game.action_data" title="Link to this heading"></a></h2>
+<p>戦闘中の単一のアクション（攻撃、回復など）に関する情報を格納するための
+データクラスを定義するモジュール。</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.myla_game.action_data.ActionData">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.myla_game.action_data.</span></span><span class="sig-name descname"><span class="pre">ActionData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">battle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#src.myla_game.battle.Battle" title="src.myla_game.battle.Battle"><span class="pre">Battle</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#src.myla_game.character.Character" title="src.myla_game.character.Character"><span class="pre">Character</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#src.myla_game.character.Character" title="src.myla_game.character.Character"><span class="pre">Character</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#src.myla_game.action_type.ActionType" title="src.myla_game.action_type.ActionType"><span class="pre">ActionType</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">effect</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#src.myla_game.effect.Effect" title="src.myla_game.effect.Effect"><span class="pre">Effect</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_crit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_defeat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list_skill</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#src.myla_game.skill_data.SkillData" title="src.myla_game.skill_data.SkillData"><span class="pre">skill_data.SkillData</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_settled</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/action_data.html#ActionData"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.action_data.ActionData" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>戦闘中の1回のアクションに関するすべての情報を保持するデータクラス。
+このオブジェクトは、あるキャラクターが行動を起こしてから、その結果が確定し、
+関連するスキルが発動するまで、情報伝達の器として機能します。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.action_data.ActionData.action_type">
+<span class="sig-name descname"><span class="pre">action_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#src.myla_game.action_type.ActionType" title="src.myla_game.action_type.ActionType"><span class="pre">ActionType</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#src.myla_game.action_data.ActionData.action_type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.action_data.ActionData.actor">
+<span class="sig-name descname"><span class="pre">actor</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#src.myla_game.character.Character" title="src.myla_game.character.Character"><span class="pre">Character</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#src.myla_game.action_data.ActionData.actor" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.action_data.ActionData.battle">
+<span class="sig-name descname"><span class="pre">battle</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#src.myla_game.battle.Battle" title="src.myla_game.battle.Battle"><span class="pre">Battle</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#src.myla_game.action_data.ActionData.battle" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.action_data.ActionData.effect">
+<span class="sig-name descname"><span class="pre">effect</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#src.myla_game.effect.Effect" title="src.myla_game.effect.Effect"><span class="pre">Effect</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#src.myla_game.action_data.ActionData.effect" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.action_data.ActionData.is_crit">
+<span class="sig-name descname"><span class="pre">is_crit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#src.myla_game.action_data.ActionData.is_crit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.action_data.ActionData.is_defeat">
+<span class="sig-name descname"><span class="pre">is_defeat</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#src.myla_game.action_data.ActionData.is_defeat" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.action_data.ActionData.is_settled">
+<span class="sig-name descname"><span class="pre">is_settled</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#src.myla_game.action_data.ActionData.is_settled" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.action_data.ActionData.list_skill">
+<span class="sig-name descname"><span class="pre">list_skill</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#src.myla_game.skill_data.SkillData" title="src.myla_game.skill_data.SkillData"><span class="pre">skill_data.SkillData</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#src.myla_game.action_data.ActionData.list_skill" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.action_data.ActionData.target">
+<span class="sig-name descname"><span class="pre">target</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#src.myla_game.character.Character" title="src.myla_game.character.Character"><span class="pre">Character</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#src.myla_game.action_data.ActionData.target" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.action_data.ActionData.value">
+<span class="sig-name descname"><span class="pre">value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#src.myla_game.action_data.ActionData.value" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.myla_game.action_type">
+<span id="src-myla-game-action-type-module"></span><h2>src.myla_game.action_type module<a class="headerlink" href="#module-src.myla_game.action_type" title="Link to this heading"></a></h2>
+<p>キャラクターの行動の種類を定義するEnumを格納するモジュール。</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.myla_game.action_type.ActionType">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.myla_game.action_type.</span></span><span class="sig-name descname"><span class="pre">ActionType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/action_type.html#ActionType"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.action_type.ActionType" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>キャラクターの行動の種類を表す列挙型。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.action_type.ActionType.ATTACK">
+<span class="sig-name descname"><span class="pre">ATTACK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#src.myla_game.action_type.ActionType.ATTACK" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.action_type.ActionType.BUFF">
+<span class="sig-name descname"><span class="pre">BUFF</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#src.myla_game.action_type.ActionType.BUFF" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.action_type.ActionType.DEBUFF">
+<span class="sig-name descname"><span class="pre">DEBUFF</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#src.myla_game.action_type.ActionType.DEBUFF" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.action_type.ActionType.HEAL">
+<span class="sig-name descname"><span class="pre">HEAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#src.myla_game.action_type.ActionType.HEAL" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.action_type.ActionType.OTHER">
+<span class="sig-name descname"><span class="pre">OTHER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></em><a class="headerlink" href="#src.myla_game.action_type.ActionType.OTHER" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.myla_game.battle">
+<span id="src-myla-game-battle-module"></span><h2>src.myla_game.battle module<a class="headerlink" href="#module-src.myla_game.battle" title="Link to this heading"></a></h2>
+<p>戦闘の進行を管理するコアロジックを実装したモジュール。</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.myla_game.battle.Battle">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.myla_game.battle.</span></span><span class="sig-name descname"><span class="pre">Battle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">team1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#src.myla_game.party.Party" title="src.myla_game.party.Party"><span class="pre">Party</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">team2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#src.myla_game.party.Party" title="src.myla_game.party.Party"><span class="pre">Party</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/battle.html#Battle"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.battle.Battle" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>2つのパーティー間の戦闘を管理・シミュレートするクラス。
+ターン制の戦闘ロジック、行動順の決定、勝敗判定などを担当します。</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.myla_game.battle.Battle.act">
+<span class="sig-name descname"><span class="pre">act</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#src.myla_game.character.Character" title="src.myla_game.character.Character"><span class="pre">character.Character</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#src.myla_game.action_data.ActionData" title="src.myla_game.action_data.ActionData"><span class="pre">action_data.ActionData</span></a></span></span><a class="reference internal" href="_modules/src/myla_game/battle.html#Battle.act"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.battle.Battle.act" title="Link to this definition"></a></dt>
+<dd><p>現在アクティブなキャラクターの行動を処理し、戦闘を1ターン進めます。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>target</strong> (<a class="reference internal" href="#src.myla_game.character.Character" title="src.myla_game.character.Character"><em>character.Character</em></a>) -- 行動の対象となるキャラクター。</p>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>実行された行動とその結果をまとめたデータ。</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#src.myla_game.action_data.ActionData" title="src.myla_game.action_data.ActionData">action_data.ActionData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.myla_game.battle.Battle.calc_order">
+<span class="sig-name descname"><span class="pre">calc_order</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/battle.html#Battle.calc_order"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.battle.Battle.calc_order" title="Link to this definition"></a></dt>
+<dd><p>現在の全キャラクターの行動カウントと速度に基づいて、行動順リストを再計算・ソートします。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.myla_game.battle.Battle.check_settled">
+<span class="sig-name descname"><span class="pre">check_settled</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/src/myla_game/battle.html#Battle.check_settled"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.battle.Battle.check_settled" title="Link to this definition"></a></dt>
+<dd><p>戦闘の勝敗が決定したかを確認します。
+どちらかのパーティーの全キャラクターが戦闘不能になった場合に終了と判定します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値<span class="colon">:</span></dt>
+<dd class="field-odd"><p>戦闘が終了していればTrue、そうでなければFalse。</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.myla_game.battle.Battle.get_active_character">
+<span class="sig-name descname"><span class="pre">get_active_character</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#src.myla_game.character.Character" title="src.myla_game.character.Character"><span class="pre">Character</span></a></span></span><a class="reference internal" href="_modules/src/myla_game/battle.html#Battle.get_active_character"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.battle.Battle.get_active_character" title="Link to this definition"></a></dt>
+<dd><p>現在行動するべきキャラクターを返します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値<span class="colon">:</span></dt>
+<dd class="field-odd"><p>現在アクティブなキャラクター。</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#src.myla_game.character.Character" title="src.myla_game.character.Character">character.Character</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.myla_game.character">
+<span id="src-myla-game-character-module"></span><h2>src.myla_game.character module<a class="headerlink" href="#module-src.myla_game.character" title="Link to this heading"></a></h2>
+<p>ゲームに登場するすべてのキャラクターの基底クラスと、それを継承した
+プレイヤークラス、敵クラスを定義するモジュール。
+キャラクターのステータス、能力、戦闘行動などのコアロジックを実装します。</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.myla_game.character.Character">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.myla_game.character.</span></span><span class="sig-name descname"><span class="pre">Character</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lv</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uuid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weapon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'weapon.Weapon'</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stone</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'stone.Stone'</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/character.html#Character"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.character.Character" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>すべてのキャラクター（プレイヤー、敵）の基本となる基底クラス。
+ステータス、装備、戦闘中の状態などを管理します。</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.myla_game.character.Character.act">
+<span class="sig-name descname"><span class="pre">act</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#src.myla_game.character.Character" title="src.myla_game.character.Character"><span class="pre">Character</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#src.myla_game.action_data.ActionData" title="src.myla_game.action_data.ActionData"><span class="pre">ActionData</span></a></span></span><a class="reference internal" href="_modules/src/myla_game/character.html#Character.act"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.character.Character.act" title="Link to this definition"></a></dt>
+<dd><p>キャラクターの1ターン分の行動を実行します。
+職業に応じて攻撃または回復を行います。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>target</strong> (<a class="reference internal" href="#src.myla_game.character.Character" title="src.myla_game.character.Character"><em>Character</em></a>) -- 行動の対象。</p>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>実行された行動の結果。</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#src.myla_game.action_data.ActionData" title="src.myla_game.action_data.ActionData">action_data.ActionData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.myla_game.character.Character.attack">
+<span class="sig-name descname"><span class="pre">attack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action_data_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#src.myla_game.action_data.ActionData" title="src.myla_game.action_data.ActionData"><span class="pre">ActionData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_status</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#src.myla_game.status.Status" title="src.myla_game.status.Status"><span class="pre">Status</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">should_crit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">should_trigger_skill</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/character.html#Character.attack"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.character.Character.attack" title="Link to this definition"></a></dt>
+<dd><p>ターゲットに攻撃を行います。クリティカル判定、ダメージ計算、ダメージ適用、
+そして攻撃をトリガーとするスキルの発動までを処理します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>action_data_obj</strong> (<a class="reference internal" href="#src.myla_game.action_data.ActionData" title="src.myla_game.action_data.ActionData"><em>action_data.ActionData</em></a>) -- この攻撃に関する情報を格納するオブジェクト。</p></li>
+<li><p><strong>ref_status</strong> (<a class="reference internal" href="#src.myla_game.status.Status" title="src.myla_game.status.Status"><em>status.Status</em></a>) -- ダメージ計算の基礎となるステータス（通常はATK）。</p></li>
+<li><p><strong>rate</strong> (<em>float</em>) -- ダメージ倍率。</p></li>
+<li><p><strong>should_crit</strong> (<em>bool</em>) -- クリティカルが発生するか。</p></li>
+<li><p><strong>should_trigger_skill</strong> (<em>bool</em>) -- この攻撃でスキルがトリガーされるか。</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.myla_game.character.Character.get_effective_status">
+<span class="sig-name descname"><span class="pre">get_effective_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">status_enum</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#src.myla_game.status.Status" title="src.myla_game.status.Status"><span class="pre">Status</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/src/myla_game/character.html#Character.get_effective_status"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.character.Character.get_effective_status" title="Link to this definition"></a></dt>
+<dd><p>指定されたステータスの最終的な実効値を計算して返します。
+キャラクターの基本ステータスに、武器、ストーン、継続効果（バフ/デバフ）による
+すべての補正を適用した値を算出します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>status_enum</strong> (<a class="reference internal" href="#src.myla_game.status.Status" title="src.myla_game.status.Status"><em>status.Status</em></a>) -- 計算対象のステータス。</p>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>計算後のステータス値。</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.myla_game.character.EnemyCharacter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.myla_game.character.</span></span><span class="sig-name descname"><span class="pre">EnemyCharacter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lv</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uuid_param</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weapon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'weapon.Weapon'</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stone</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'stone.Stone'</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/character.html#EnemyCharacter"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.character.EnemyCharacter" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <a class="reference internal" href="#src.myla_game.character.Character" title="src.myla_game.character.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a></p>
+<p>敵キャラクターを表すクラス。
+<a href="#id1"><span class="problematic" id="id2">`</span></a>Character`を継承し、討伐時に得られる経験値などの敵固有の属性を追加します。</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.myla_game.character.PlayerCharacter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.myla_game.character.</span></span><span class="sig-name descname"><span class="pre">PlayerCharacter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lv</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uuid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weapon</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'weapon.Weapon'</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stone</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'stone.Stone'</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/character.html#PlayerCharacter"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.character.PlayerCharacter" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <a class="reference internal" href="#src.myla_game.character.Character" title="src.myla_game.character.Character"><code class="xref py py-class docutils literal notranslate"><span class="pre">Character</span></code></a></p>
+<p>プレイヤーが操作するキャラクターを表すクラス。
+<a href="#id3"><span class="problematic" id="id4">`</span></a>Character`を継承し、経験値や凸数などのプレイヤー固有の属性を追加します。</p>
+</dd></dl>
+
+</section>
+<section id="module-src.myla_game.effect">
+<span id="src-myla-game-effect-module"></span><h2>src.myla_game.effect module<a class="headerlink" href="#module-src.myla_game.effect" title="Link to this heading"></a></h2>
+<p>戦闘中の継続的なステータス変化（バフ・デバフ）を表現するための
+データクラスを定義するモジュール。</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.myla_game.effect.Effect">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.myla_game.effect.</span></span><span class="sig-name descname"><span class="pre">Effect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">status</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#src.myla_game.status.Status" title="src.myla_game.status.Status"><span class="pre">Status</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#src.myla_game.effect_type.EffectType" title="src.myla_game.effect_type.EffectType"><span class="pre">EffectType</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tag</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'Default'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/effect.html#Effect"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.effect.Effect" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>キャラクターに付与される継続的な効果（バフ・デバフ）を表すデータクラス。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.effect.Effect.duration">
+<span class="sig-name descname"><span class="pre">duration</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#src.myla_game.effect.Effect.duration" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.effect.Effect.status">
+<span class="sig-name descname"><span class="pre">status</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#src.myla_game.status.Status" title="src.myla_game.status.Status"><span class="pre">Status</span></a></em><a class="headerlink" href="#src.myla_game.effect.Effect.status" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.effect.Effect.tag">
+<span class="sig-name descname"><span class="pre">tag</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Default'</span></em><a class="headerlink" href="#src.myla_game.effect.Effect.tag" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.effect.Effect.type">
+<span class="sig-name descname"><span class="pre">type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#src.myla_game.effect_type.EffectType" title="src.myla_game.effect_type.EffectType"><span class="pre">EffectType</span></a></em><a class="headerlink" href="#src.myla_game.effect.Effect.type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.effect.Effect.value">
+<span class="sig-name descname"><span class="pre">value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#src.myla_game.effect.Effect.value" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.myla_game.effect_type">
+<span id="src-myla-game-effect-type-module"></span><h2>src.myla_game.effect_type module<a class="headerlink" href="#module-src.myla_game.effect_type" title="Link to this heading"></a></h2>
+<p>エフェクト（バフ・デバフ）がステータスにどのように作用するかを定義する
+Enumを格納するモジュール。</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.myla_game.effect_type.EffectType">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.myla_game.effect_type.</span></span><span class="sig-name descname"><span class="pre">EffectType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/effect_type.html#EffectType"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.effect_type.EffectType" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>エフェクトの適用方法を表す列挙型。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.effect_type.EffectType.ADD">
+<span class="sig-name descname"><span class="pre">ADD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#src.myla_game.effect_type.EffectType.ADD" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.effect_type.EffectType.RATE">
+<span class="sig-name descname"><span class="pre">RATE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#src.myla_game.effect_type.EffectType.RATE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.myla_game.element">
+<span id="src-myla-game-element-module"></span><h2>src.myla_game.element module<a class="headerlink" href="#module-src.myla_game.element" title="Link to this heading"></a></h2>
+<p>キャラクターの属性を定義するEnumを格納するモジュール。</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.myla_game.element.Element">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.myla_game.element.</span></span><span class="sig-name descname"><span class="pre">Element</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/element.html#Element"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.element.Element" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>キャラクターの属性を表す列挙型。
+各属性は、回復、バフ、デバフに対する基本効果量を持ちます。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.element.Element.AIR">
+<span class="sig-name descname"><span class="pre">AIR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(5,</span> <span class="pre">'風',</span> <span class="pre">0.1,</span> <span class="pre">0.05,</span> <span class="pre">0.15)</span></em><a class="headerlink" href="#src.myla_game.element.Element.AIR" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.element.Element.ELECTRIC">
+<span class="sig-name descname"><span class="pre">ELECTRIC</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(1,</span> <span class="pre">'雷',</span> <span class="pre">0.05,</span> <span class="pre">0.1,</span> <span class="pre">0.15)</span></em><a class="headerlink" href="#src.myla_game.element.Element.ELECTRIC" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.element.Element.FIRE">
+<span class="sig-name descname"><span class="pre">FIRE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(4,</span> <span class="pre">'火',</span> <span class="pre">0.05,</span> <span class="pre">0.15,</span> <span class="pre">0.1)</span></em><a class="headerlink" href="#src.myla_game.element.Element.FIRE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.element.Element.GRASS">
+<span class="sig-name descname"><span class="pre">GRASS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(0,</span> <span class="pre">'草',</span> <span class="pre">0.15,</span> <span class="pre">0.1,</span> <span class="pre">0.05)</span></em><a class="headerlink" href="#src.myla_game.element.Element.GRASS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.element.Element.ROCK">
+<span class="sig-name descname"><span class="pre">ROCK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(2,</span> <span class="pre">'岩',</span> <span class="pre">0.1,</span> <span class="pre">0.15,</span> <span class="pre">0.05)</span></em><a class="headerlink" href="#src.myla_game.element.Element.ROCK" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.element.Element.WATER">
+<span class="sig-name descname"><span class="pre">WATER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(3,</span> <span class="pre">'水',</span> <span class="pre">0.15,</span> <span class="pre">0.05,</span> <span class="pre">0.1)</span></em><a class="headerlink" href="#src.myla_game.element.Element.WATER" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.myla_game.element.Element.get_by_id">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_by_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#src.myla_game.element.Element" title="src.myla_game.element.Element"><span class="pre">Element</span></a></span></span><a class="reference internal" href="_modules/src/myla_game/element.html#Element.get_by_id"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.element.Element.get_by_id" title="Link to this definition"></a></dt>
+<dd><p>IDから対応するElementメンバーを返します。</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.myla_game.job">
+<span id="src-myla-game-job-module"></span><h2>src.myla_game.job module<a class="headerlink" href="#module-src.myla_game.job" title="Link to this heading"></a></h2>
+<p>キャラクターの職業を定義するEnumを格納するモジュール。</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.myla_game.job.Job">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.myla_game.job.</span></span><span class="sig-name descname"><span class="pre">Job</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/job.html#Job"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.job.Job" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>キャラクターの職業を表す列挙型。
+職業ごとに、敵から狙われやすさ（hate）、基本行動タイプ、習得スキルなどが定義されています。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.job.Job.ASSASSIN">
+<span class="sig-name descname"><span class="pre">ASSASSIN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(5,</span> <span class="pre">'アサシン',</span> <span class="pre">1,</span> <span class="pre">ActionType.ATTACK,</span> <span class="pre">[Skill.ASSASSIN_1])</span></em><a class="headerlink" href="#src.myla_game.job.Job.ASSASSIN" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.job.Job.BERSERKER">
+<span class="sig-name descname"><span class="pre">BERSERKER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(4,</span> <span class="pre">'バーサーカー',</span> <span class="pre">3,</span> <span class="pre">ActionType.ATTACK,</span> <span class="pre">[Skill.BERSERKER_1])</span></em><a class="headerlink" href="#src.myla_game.job.Job.BERSERKER" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.job.Job.CLERIC">
+<span class="sig-name descname"><span class="pre">CLERIC</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(3,</span> <span class="pre">'クレリック',</span> <span class="pre">2,</span> <span class="pre">ActionType.ATTACK,</span> <span class="pre">[Skill.CLERIC_1])</span></em><a class="headerlink" href="#src.myla_game.job.Job.CLERIC" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.job.Job.FIGHTER">
+<span class="sig-name descname"><span class="pre">FIGHTER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(1,</span> <span class="pre">'ファイター',</span> <span class="pre">4,</span> <span class="pre">ActionType.ATTACK,</span> <span class="pre">[Skill.FIGHTER_1])</span></em><a class="headerlink" href="#src.myla_game.job.Job.FIGHTER" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.job.Job.GUARDIAN">
+<span class="sig-name descname"><span class="pre">GUARDIAN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(2,</span> <span class="pre">'ガーディアン',</span> <span class="pre">5,</span> <span class="pre">ActionType.ATTACK,</span> <span class="pre">[Skill.GUARDIAN_1])</span></em><a class="headerlink" href="#src.myla_game.job.Job.GUARDIAN" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.job.Job.SHAMAN">
+<span class="sig-name descname"><span class="pre">SHAMAN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(0,</span> <span class="pre">'シャーマン',</span> <span class="pre">6,</span> <span class="pre">ActionType.HEAL,</span> <span class="pre">[Skill.SHAMAN_1])</span></em><a class="headerlink" href="#src.myla_game.job.Job.SHAMAN" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.myla_game.job.Job.get_by_id">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_by_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#src.myla_game.job.Job" title="src.myla_game.job.Job"><span class="pre">Job</span></a></span></span><a class="reference internal" href="_modules/src/myla_game/job.html#Job.get_by_id"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.job.Job.get_by_id" title="Link to this definition"></a></dt>
+<dd><p>IDから対応するJobメンバーを返します。</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.myla_game.myla_game">
+<span id="src-myla-game-myla-game-module"></span><h2>src.myla_game.myla_game module<a class="headerlink" href="#module-src.myla_game.myla_game" title="Link to this heading"></a></h2>
+<p><cite>myla_game`パッケージのメインモジュール。
+このパッケージ内の主要なクラスやEnumをすべてインポートし、
+`from ..myla_game import myla_game as game</cite> のような形で
+外部モジュールから簡単にアクセスできるようにします。
+Pythonの`__init__.py`ファイルと同様の役割を果たします。</p>
+</section>
+<section id="module-src.myla_game.party">
+<span id="src-myla-game-party-module"></span><h2>src.myla_game.party module<a class="headerlink" href="#module-src.myla_game.party" title="Link to this heading"></a></h2>
+<p>戦闘単位となるパーティーを定義するモジュール。</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.myla_game.party.EnemyParty">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.myla_game.party.</span></span><span class="sig-name descname"><span class="pre">EnemyParty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">characters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#src.myla_game.character.EnemyCharacter" title="src.myla_game.character.EnemyCharacter"><span class="pre">character.EnemyCharacter</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uuid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/party.html#EnemyParty"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.party.EnemyParty" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <a class="reference internal" href="#src.myla_game.party.Party" title="src.myla_game.party.Party"><code class="xref py py-class docutils literal notranslate"><span class="pre">Party</span></code></a></p>
+<p>敵のパーティーを表すクラス。</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.myla_game.party.Party">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.myla_game.party.</span></span><span class="sig-name descname"><span class="pre">Party</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">characters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#src.myla_game.character.Character" title="src.myla_game.character.Character"><span class="pre">character.Character</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">party_uuid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/party.html#Party"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.party.Party" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>キャラクターの集合であるパーティーを表す基底クラス。</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.myla_game.party.PlayerParty">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.myla_game.party.</span></span><span class="sig-name descname"><span class="pre">PlayerParty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">characters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#src.myla_game.character.PlayerCharacter" title="src.myla_game.character.PlayerCharacter"><span class="pre">character.PlayerCharacter</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uuid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/party.html#PlayerParty"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.party.PlayerParty" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <a class="reference internal" href="#src.myla_game.party.Party" title="src.myla_game.party.Party"><code class="xref py py-class docutils literal notranslate"><span class="pre">Party</span></code></a></p>
+<p>プレイヤーのパーティーを表すクラス。</p>
+</dd></dl>
+
+</section>
+<section id="module-src.myla_game.skill">
+<span id="src-myla-game-skill-module"></span><h2>src.myla_game.skill module<a class="headerlink" href="#module-src.myla_game.skill" title="Link to this heading"></a></h2>
+<p>ゲーム内に登場するすべてのスキル（武器スキル、ジョブスキルなど）を定義するモジュール。</p>
+<p><cite>Skill</cite> Enumは、各スキルのID、名前、トリガー条件、そして具体的な効果を実装した関数を
+一元管理します。これにより、スキルデータとロジックが密結合し、管理が容易になります。</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.myla_game.skill.Skill">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.myla_game.skill.</span></span><span class="sig-name descname"><span class="pre">Skill</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/skill.html#Skill"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.skill.Skill" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>ゲーム内のすべてのスキルを定義するEnum。</p>
+<p>各メンバーは以下の情報を持つタプルとして定義されます:
+- id (int): スキルの一意なID。
+- name_ja (str): スキル名（日本語）。
+- trigger_type (list[TriggerType]): スキルが発動する条件のリスト。
+- func (function): スキルの効果を実装した関数。</p>
+<p>各スキルロジック関数は、<a href="#id5"><span class="problematic" id="id6">`</span></a>action_data.ActionData`オブジェクトを引数に取り、
+戦闘状態の変更や追加効果の発生などを行います。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.skill.Skill.ASSASSIN_1">
+<span class="sig-name descname"><span class="pre">ASSASSIN_1</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(10,</span> <span class="pre">'アサシン１',</span> <span class="pre">[TriggerType.DEFEAT],</span> <span class="pre">&lt;function</span> <span class="pre">Skill.func_assassin_1&gt;)</span></em><a class="headerlink" href="#src.myla_game.skill.Skill.ASSASSIN_1" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.skill.Skill.ASSASSIN_2">
+<span class="sig-name descname"><span class="pre">ASSASSIN_2</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(11,</span> <span class="pre">'アサシン２',</span> <span class="pre">[TriggerType.CRIT],</span> <span class="pre">&lt;function</span> <span class="pre">Skill.func_assassin_2&gt;)</span></em><a class="headerlink" href="#src.myla_game.skill.Skill.ASSASSIN_2" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.skill.Skill.BERSERKER_1">
+<span class="sig-name descname"><span class="pre">BERSERKER_1</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(8,</span> <span class="pre">'バーサーカー１',</span> <span class="pre">[TriggerType.CRIT],</span> <span class="pre">&lt;function</span> <span class="pre">Skill.func_berserker_1&gt;)</span></em><a class="headerlink" href="#src.myla_game.skill.Skill.BERSERKER_1" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.skill.Skill.BERSERKER_2">
+<span class="sig-name descname"><span class="pre">BERSERKER_2</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(9,</span> <span class="pre">'バーサーカー２',</span> <span class="pre">[TriggerType.DAMAGED,</span> <span class="pre">TriggerType.HEALED],</span> <span class="pre">&lt;function</span> <span class="pre">Skill.func_berserker_2&gt;)</span></em><a class="headerlink" href="#src.myla_game.skill.Skill.BERSERKER_2" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.skill.Skill.CLERIC_1">
+<span class="sig-name descname"><span class="pre">CLERIC_1</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(6,</span> <span class="pre">'クレリック１',</span> <span class="pre">[TriggerType.CRIT],</span> <span class="pre">&lt;function</span> <span class="pre">Skill.func_cleric_1&gt;)</span></em><a class="headerlink" href="#src.myla_game.skill.Skill.CLERIC_1" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.skill.Skill.CLERIC_2">
+<span class="sig-name descname"><span class="pre">CLERIC_2</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(7,</span> <span class="pre">'クレリック２',</span> <span class="pre">[TriggerType.CRIT],</span> <span class="pre">&lt;function</span> <span class="pre">Skill.func_cleric_2&gt;)</span></em><a class="headerlink" href="#src.myla_game.skill.Skill.CLERIC_2" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.skill.Skill.FIGHTER_1">
+<span class="sig-name descname"><span class="pre">FIGHTER_1</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(2,</span> <span class="pre">'ファイター１',</span> <span class="pre">[TriggerType.CRIT],</span> <span class="pre">&lt;function</span> <span class="pre">Skill.func_fighter_1&gt;)</span></em><a class="headerlink" href="#src.myla_game.skill.Skill.FIGHTER_1" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.skill.Skill.FIGHTER_2">
+<span class="sig-name descname"><span class="pre">FIGHTER_2</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(3,</span> <span class="pre">'ファイター２',</span> <span class="pre">[TriggerType.ATTACK],</span> <span class="pre">&lt;function</span> <span class="pre">Skill.func_fighter_2&gt;)</span></em><a class="headerlink" href="#src.myla_game.skill.Skill.FIGHTER_2" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.skill.Skill.GUARDIAN_1">
+<span class="sig-name descname"><span class="pre">GUARDIAN_1</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(4,</span> <span class="pre">'ガーディアン１',</span> <span class="pre">[TriggerType.ATTACK],</span> <span class="pre">&lt;function</span> <span class="pre">Skill.func_guardian_1&gt;)</span></em><a class="headerlink" href="#src.myla_game.skill.Skill.GUARDIAN_1" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.skill.Skill.GUARDIAN_2">
+<span class="sig-name descname"><span class="pre">GUARDIAN_2</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(5,</span> <span class="pre">'ガーディアン２',</span> <span class="pre">[TriggerType.CRIT],</span> <span class="pre">&lt;function</span> <span class="pre">Skill.func_guardian_2&gt;)</span></em><a class="headerlink" href="#src.myla_game.skill.Skill.GUARDIAN_2" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.skill.Skill.SHAMAN_1">
+<span class="sig-name descname"><span class="pre">SHAMAN_1</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(0,</span> <span class="pre">'自己再生',</span> <span class="pre">[TriggerType.HEAL],</span> <span class="pre">&lt;function</span> <span class="pre">Skill.func_shaman_1&gt;)</span></em><a class="headerlink" href="#src.myla_game.skill.Skill.SHAMAN_1" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.skill.Skill.SHAMAN_2">
+<span class="sig-name descname"><span class="pre">SHAMAN_2</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(1,</span> <span class="pre">'シャーマン２',</span> <span class="pre">[TriggerType.HEAL],</span> <span class="pre">&lt;function</span> <span class="pre">Skill.func_shaman_2&gt;)</span></em><a class="headerlink" href="#src.myla_game.skill.Skill.SHAMAN_2" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.myla_game.skill.Skill.func">
+<span class="sig-name descname"><span class="pre">func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ad</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#src.myla_game.action_data.ActionData" title="src.myla_game.action_data.ActionData"><span class="pre">ActionData</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/skill.html#Skill.func"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.skill.Skill.func" title="Link to this definition"></a></dt>
+<dd><p>このスキルに紐付けられたロジック関数を実行します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ad</strong> (<a class="reference internal" href="#src.myla_game.action_data.ActionData" title="src.myla_game.action_data.ActionData"><em>ActionData</em></a>) -- スキル処理に渡される行動データ。</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.myla_game.skill.Skill.func_assassin_1">
+<span class="sig-name descname"><span class="pre">func_assassin_1</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/skill.html#Skill.func_assassin_1"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.skill.Skill.func_assassin_1" title="Link to this definition"></a></dt>
+<dd><p>【アサシン１】のスキルロジック。
+トリガー：敵を倒した時 (DEFEAT)</p>
+<p>自身の行動ゲージをリセットし、即座に再行動します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ad</strong> (<a class="reference internal" href="#src.myla_game.action_data.ActionData" title="src.myla_game.action_data.ActionData"><em>ActionData</em></a>) -- 元となった行動のデータ。</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.myla_game.skill.Skill.func_assassin_2">
+<span class="sig-name descname"><span class="pre">func_assassin_2</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/skill.html#Skill.func_assassin_2"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.skill.Skill.func_assassin_2" title="Link to this definition"></a></dt>
+<dd><p>【アサシン２】のスキルロジック。
+トリガー：クリティカル攻撃時 (CRIT)</p>
+<p>攻撃対象の攻撃力を、術者のデバフ効果率に応じて2ターンの間減少させます。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ad</strong> (<a class="reference internal" href="#src.myla_game.action_data.ActionData" title="src.myla_game.action_data.ActionData"><em>ActionData</em></a>) -- 元となった行動のデータ。</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.myla_game.skill.Skill.func_berserker_1">
+<span class="sig-name descname"><span class="pre">func_berserker_1</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/skill.html#Skill.func_berserker_1"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.skill.Skill.func_berserker_1" title="Link to this definition"></a></dt>
+<dd><p>【バーサーカー１】のスキルロジック。
+トリガー：クリティカル攻撃時 (CRIT)</p>
+<p>攻撃対象の速度を、術者のデバフ効果率に応じて2ターンの間減少させます。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ad</strong> (<a class="reference internal" href="#src.myla_game.action_data.ActionData" title="src.myla_game.action_data.ActionData"><em>ActionData</em></a>) -- 元となった行動のデータ。</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.myla_game.skill.Skill.func_berserker_2">
+<span class="sig-name descname"><span class="pre">func_berserker_2</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/skill.html#Skill.func_berserker_2"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.skill.Skill.func_berserker_2" title="Link to this definition"></a></dt>
+<dd><p>【バーサーカー２】のスキルロジック。
+トリガー：被ダメージ時 (DAMAGED), 回復時 (HEALED)</p>
+<p>自身のHPが30%以下の場合、攻撃力を30%上昇させる永続バフを付与します。
+HPが30%を超えると、このバフは解除されます。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ad</strong> (<a class="reference internal" href="#src.myla_game.action_data.ActionData" title="src.myla_game.action_data.ActionData"><em>ActionData</em></a>) -- 元となった行動のデータ。</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.myla_game.skill.Skill.func_cleric_1">
+<span class="sig-name descname"><span class="pre">func_cleric_1</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/skill.html#Skill.func_cleric_1"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.skill.Skill.func_cleric_1" title="Link to this definition"></a></dt>
+<dd><p>【クレリック１】のスキルロジック。
+トリガー：クリティカル攻撃時 (CRIT)</p>
+<p>味方の中で最もHPが低いキャラクターを、術者の攻撃力に依存して回復します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ad</strong> (<a class="reference internal" href="#src.myla_game.action_data.ActionData" title="src.myla_game.action_data.ActionData"><em>ActionData</em></a>) -- 元となった行動のデータ。</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.myla_game.skill.Skill.func_cleric_2">
+<span class="sig-name descname"><span class="pre">func_cleric_2</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/skill.html#Skill.func_cleric_2"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.skill.Skill.func_cleric_2" title="Link to this definition"></a></dt>
+<dd><p>【クレリック２】のスキルロジック。
+トリガー：クリティカル攻撃時 (CRIT)</p>
+<p>次に行動する味方の攻撃力を、術者のバフ効果率に応じて上昇させます。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ad</strong> (<a class="reference internal" href="#src.myla_game.action_data.ActionData" title="src.myla_game.action_data.ActionData"><em>ActionData</em></a>) -- 元となった行動のデータ。</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.myla_game.skill.Skill.func_fighter_1">
+<span class="sig-name descname"><span class="pre">func_fighter_1</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/skill.html#Skill.func_fighter_1"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.skill.Skill.func_fighter_1" title="Link to this definition"></a></dt>
+<dd><p>【ファイター１】のスキルロジック。
+トリガー：クリティカル攻撃時 (CRIT)</p>
+<p>攻撃対象の防御力を、術者のデバフ効果率に応じて2ターンの間減少させます。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ad</strong> (<a class="reference internal" href="#src.myla_game.action_data.ActionData" title="src.myla_game.action_data.ActionData"><em>ActionData</em></a>) -- 元となった行動のデータ。</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.myla_game.skill.Skill.func_fighter_2">
+<span class="sig-name descname"><span class="pre">func_fighter_2</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/skill.html#Skill.func_fighter_2"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.skill.Skill.func_fighter_2" title="Link to this definition"></a></dt>
+<dd><p>【ファイター２】のスキルロジック。
+トリガー：攻撃時 (ATTACK)</p>
+<p>主対象以外の敵単体に、攻撃力の20%の追撃を行います。
+この追撃ではスキルはトリガーされません。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ad</strong> (<a class="reference internal" href="#src.myla_game.action_data.ActionData" title="src.myla_game.action_data.ActionData"><em>ActionData</em></a>) -- 元となった行動のデータ。</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.myla_game.skill.Skill.func_guardian_1">
+<span class="sig-name descname"><span class="pre">func_guardian_1</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/skill.html#Skill.func_guardian_1"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.skill.Skill.func_guardian_1" title="Link to this definition"></a></dt>
+<dd><p>【ガーディアン１】のスキルロジック。
+トリガー：攻撃時 (ATTACK)</p>
+<p>味方の中で最もHPが低いキャラクターの防御力を、術者の防御力とバフ効果率に応じて2ターンの間上昇させます。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ad</strong> (<a class="reference internal" href="#src.myla_game.action_data.ActionData" title="src.myla_game.action_data.ActionData"><em>ActionData</em></a>) -- 元となった行動のデータ。</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.myla_game.skill.Skill.func_guardian_2">
+<span class="sig-name descname"><span class="pre">func_guardian_2</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/skill.html#Skill.func_guardian_2"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.skill.Skill.func_guardian_2" title="Link to this definition"></a></dt>
+<dd><p>【ガーディアン２】のスキルロジック。
+トリガー：クリティカル攻撃時 (CRIT)</p>
+<p>術者以外の味方2体に、防御力上昇バフを2ターンの間付与します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ad</strong> (<a class="reference internal" href="#src.myla_game.action_data.ActionData" title="src.myla_game.action_data.ActionData"><em>ActionData</em></a>) -- 元となった行動のデータ。</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.myla_game.skill.Skill.func_shaman_1">
+<span class="sig-name descname"><span class="pre">func_shaman_1</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/skill.html#Skill.func_shaman_1"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.skill.Skill.func_shaman_1" title="Link to this definition"></a></dt>
+<dd><p>【シャーマン１：自己再生】のスキルロジック。
+トリガー：回復行動時 (HEAL)</p>
+<p>術者のHPを、術者の最大HPの20%分回復させます。
+このスキルによる回復では、さらなるスキルはトリガーされません。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ad</strong> (<a class="reference internal" href="#src.myla_game.action_data.ActionData" title="src.myla_game.action_data.ActionData"><em>ActionData</em></a>) -- 元となった行動のデータ。</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.myla_game.skill.Skill.func_shaman_2">
+<span class="sig-name descname"><span class="pre">func_shaman_2</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/skill.html#Skill.func_shaman_2"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.skill.Skill.func_shaman_2" title="Link to this definition"></a></dt>
+<dd><p>【シャーマン２】のスキルロジック。
+トリガー：回復行動時 (HEAL)</p>
+<p>回復対象の攻撃力を、術者のバフ効果率に応じて上昇させます。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ad</strong> (<a class="reference internal" href="#src.myla_game.action_data.ActionData" title="src.myla_game.action_data.ActionData"><em>ActionData</em></a>) -- 元となった行動のデータ。</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.myla_game.skill.Skill.get_by_id">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_by_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/skill.html#Skill.get_by_id"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.skill.Skill.get_by_id" title="Link to this definition"></a></dt>
+<dd><p>指定されたIDを持つSkillメンバーを返します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>id</strong> (<em>int</em>) -- 検索するスキルのID。</p>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>見つかったSkill Enumメンバー。</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#src.myla_game.skill.Skill" title="src.myla_game.skill.Skill">Skill</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.myla_game.skill_data">
+<span id="src-myla-game-skill-data-module"></span><h2>src.myla_game.skill_data module<a class="headerlink" href="#module-src.myla_game.skill_data" title="Link to this heading"></a></h2>
+<p>発動したスキルに関する情報を格納するためのデータクラスを定義するモジュール。</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.myla_game.skill_data.SkillData">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.myla_game.skill_data.</span></span><span class="sig-name descname"><span class="pre">SkillData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">skill_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#src.myla_game.skill.Skill" title="src.myla_game.skill.Skill"><span class="pre">Skill</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#src.myla_game.action_data.ActionData" title="src.myla_game.action_data.ActionData"><span class="pre">ActionData</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/skill_data.html#SkillData"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.skill_data.SkillData" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>どのスキルが、どの行動（ActionData）によって発動したかを記録するためのデータクラス。
+主にログ表示用に使用されます。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.skill_data.SkillData.action_data">
+<span class="sig-name descname"><span class="pre">action_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#src.myla_game.action_data.ActionData" title="src.myla_game.action_data.ActionData"><span class="pre">ActionData</span></a></em><a class="headerlink" href="#src.myla_game.skill_data.SkillData.action_data" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.skill_data.SkillData.skill_type">
+<span class="sig-name descname"><span class="pre">skill_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#src.myla_game.skill.Skill" title="src.myla_game.skill.Skill"><span class="pre">Skill</span></a></em><a class="headerlink" href="#src.myla_game.skill_data.SkillData.skill_type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.myla_game.status">
+<span id="src-myla-game-status-module"></span><h2>src.myla_game.status module<a class="headerlink" href="#module-src.myla_game.status" title="Link to this heading"></a></h2>
+<p>キャラクターや武器が持つステータスパラメータを定義するEnumを格納するモジュール。</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.myla_game.status.Status">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.myla_game.status.</span></span><span class="sig-name descname"><span class="pre">Status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/status.html#Status"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.status.Status" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>キャラクターや装備が持つパラメータを表す列挙型。
+各ステータスは、ID、日本語名、レベルアップで成長するか、武器に付くかなどの属性を持ちます。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.status.Status.ATK">
+<span class="sig-name descname"><span class="pre">ATK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(1,</span> <span class="pre">'攻撃',</span> <span class="pre">True,</span> <span class="pre">True,</span> <span class="pre">1)</span></em><a class="headerlink" href="#src.myla_game.status.Status.ATK" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.status.Status.C_DMG">
+<span class="sig-name descname"><span class="pre">C_DMG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(4,</span> <span class="pre">'会心ダメージ',</span> <span class="pre">False,</span> <span class="pre">False,</span> <span class="pre">0.0)</span></em><a class="headerlink" href="#src.myla_game.status.Status.C_DMG" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.status.Status.C_RATE">
+<span class="sig-name descname"><span class="pre">C_RATE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(3,</span> <span class="pre">'会心率',</span> <span class="pre">False,</span> <span class="pre">False,</span> <span class="pre">0.0)</span></em><a class="headerlink" href="#src.myla_game.status.Status.C_RATE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.status.Status.DEF">
+<span class="sig-name descname"><span class="pre">DEF</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(2,</span> <span class="pre">'防御',</span> <span class="pre">True,</span> <span class="pre">True,</span> <span class="pre">1)</span></em><a class="headerlink" href="#src.myla_game.status.Status.DEF" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.status.Status.HP">
+<span class="sig-name descname"><span class="pre">HP</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(0,</span> <span class="pre">'体力',</span> <span class="pre">True,</span> <span class="pre">True,</span> <span class="pre">1)</span></em><a class="headerlink" href="#src.myla_game.status.Status.HP" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.status.Status.SPD">
+<span class="sig-name descname"><span class="pre">SPD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(5,</span> <span class="pre">'速度',</span> <span class="pre">False,</span> <span class="pre">False,</span> <span class="pre">1)</span></em><a class="headerlink" href="#src.myla_game.status.Status.SPD" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.myla_game.status.Status.calc_value">
+<span class="sig-name descname"><span class="pre">calc_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/src/myla_game/status.html#Status.calc_value"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.status.Status.calc_value" title="Link to this definition"></a></dt>
+<dd><p>値を計算用の型（整数または浮動小数点数）に変換します。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.myla_game.status.Status.get_by_id">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_by_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#src.myla_game.status.Status" title="src.myla_game.status.Status"><span class="pre">Status</span></a></span></span><a class="reference internal" href="_modules/src/myla_game/status.html#Status.get_by_id"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.status.Status.get_by_id" title="Link to this definition"></a></dt>
+<dd><p>IDから対応するStatusメンバーを返します。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.myla_game.status.Status.get_display_value">
+<span class="sig-name descname"><span class="pre">get_display_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/src/myla_game/status.html#Status.get_display_value"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.status.Status.get_display_value" title="Link to this definition"></a></dt>
+<dd><p>値を表示用の文字列（整数またはパーセンテージ）にフォーマットします。</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.myla_game.stone">
+<span id="src-myla-game-stone-module"></span><h2>src.myla_game.stone module<a class="headerlink" href="#module-src.myla_game.stone" title="Link to this heading"></a></h2>
+<p>ゲーム内の装備品「ストーン」に関するデータ構造とロジックを定義するモジュール。</p>
+<p>ストーンのオプション、部位（タイプ）、セット効果をEnumとして定義し、
+ストーンの生成、強化（レベルアップ）、経験値計算などの機能を持つ`Stone`クラスを提供します。
+データは <cite>asset/data/stone.json</cite> から動的に読み込まれます。</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.myla_game.stone.MainOptionData">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.myla_game.stone.</span></span><span class="sig-name descname"><span class="pre">MainOptionData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">option</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#src.myla_game.stone.StoneOption" title="src.myla_game.stone.StoneOption"><span class="pre">StoneOption</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/stone.html#MainOptionData"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.stone.MainOptionData" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <a class="reference internal" href="#src.myla_game.stone.OptionData" title="src.myla_game.stone.OptionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">OptionData</span></code></a></p>
+<p>ストーンのメインオプションを表すクラス。</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.myla_game.stone.MainOptionData.enhance">
+<span class="sig-name descname"><span class="pre">enhance</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/stone.html#MainOptionData.enhance"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.stone.MainOptionData.enhance" title="Link to this definition"></a></dt>
+<dd><p>オプションを1段階強化します。固定の上昇値が加算されます。</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.myla_game.stone.OptionData">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.myla_game.stone.</span></span><span class="sig-name descname"><span class="pre">OptionData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">option</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#src.myla_game.stone.StoneOption" title="src.myla_game.stone.StoneOption"><span class="pre">StoneOption</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/stone.html#OptionData"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.stone.OptionData" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>メインオプションとサブオプションの基底クラス。</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.myla_game.stone.OptionData.get_display_value">
+<span class="sig-name descname"><span class="pre">get_display_value</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/src/myla_game/stone.html#OptionData.get_display_value"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.stone.OptionData.get_display_value" title="Link to this definition"></a></dt>
+<dd><p>表示用にフォーマットされたオプションの値を文字列として返します。
+例: &quot;15.3%&quot; や &quot;125&quot;。</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値<span class="colon">:</span></dt>
+<dd class="field-odd"><p>フォーマット済みの値。</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.myla_game.stone.Stone">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.myla_game.stone.</span></span><span class="sig-name descname"><span class="pre">Stone</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lv</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uuid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">set</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#src.myla_game.stone.StoneSet" title="src.myla_game.stone.StoneSet"><span class="pre">StoneSet</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#src.myla_game.stone.StoneType" title="src.myla_game.stone.StoneType"><span class="pre">StoneType</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mop</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#src.myla_game.stone.MainOptionData" title="src.myla_game.stone.MainOptionData"><span class="pre">MainOptionData</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">sops</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#src.myla_game.stone.SubOptionData" title="src.myla_game.stone.SubOptionData"><span class="pre">SubOptionData</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_lock</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/stone.html#Stone"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.stone.Stone" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>ストーン本体を表すクラス。
+生成、強化、経験値管理などのロジックを持ちます。</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.myla_game.stone.Stone.calc_lvup">
+<span class="sig-name descname"><span class="pre">calc_lvup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exp_item_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/src/myla_game/stone.html#Stone.calc_lvup"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.stone.Stone.calc_lvup" title="Link to this definition"></a></dt>
+<dd><p>指定された数の経験値アイテムを使用した場合のレベルアップ結果を計算（プレビュー）します。
+実際の経験値やレベルは変更しません。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>exp_item_value</strong> (<em>int</em>) -- 使用する経験値アイテムの数。</p>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>(上昇するレベル数, 実際に消費されるアイテム数)。</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[int, int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.myla_game.stone.Stone.convert_to_exp">
+<span class="sig-name descname"><span class="pre">convert_to_exp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/src/myla_game/stone.html#Stone.convert_to_exp"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.stone.Stone.convert_to_exp" title="Link to this definition"></a></dt>
+<dd><p>このストーンを粉砕した場合に得られる総経験値を計算します。
+(基本経験値 + レベルアップに必要な累計経験値 + 現在の余剰経験値)</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値<span class="colon">:</span></dt>
+<dd class="field-odd"><p>総経験値。</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.myla_game.stone.Stone.create">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">set</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#src.myla_game.stone.StoneSet" title="src.myla_game.stone.StoneSet"><span class="pre">StoneSet</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#src.myla_game.stone.StoneType" title="src.myla_game.stone.StoneType"><span class="pre">StoneType</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#src.myla_game.stone.Stone" title="src.myla_game.stone.Stone"><span class="pre">Stone</span></a></span></span><a class="reference internal" href="_modules/src/myla_game/stone.html#Stone.create"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.stone.Stone.create" title="Link to this definition"></a></dt>
+<dd><p>新しいストーンをランダムに生成するファクトリメソッド。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>set</strong> (<a class="reference internal" href="#src.myla_game.stone.StoneSet" title="src.myla_game.stone.StoneSet"><em>StoneSet</em></a>) -- 生成するストーンのセット。</p></li>
+<li><p><strong>type</strong> (<a class="reference internal" href="#src.myla_game.stone.StoneType" title="src.myla_game.stone.StoneType"><em>StoneType</em></a>) -- 生成するストーンの部位。</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>新しく生成されたStoneオブジェクト。</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#src.myla_game.stone.Stone" title="src.myla_game.stone.Stone">Stone</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.myla_game.stone.Stone.give_exp">
+<span class="sig-name descname"><span class="pre">give_exp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exp_amount</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/src/myla_game/stone.html#Stone.give_exp"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.stone.Stone.give_exp" title="Link to this definition"></a></dt>
+<dd><p>ストーンに経験値を付与し、必要であればレベルアップ処理を呼び出します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>exp_amount</strong> (<em>int</em>) -- 付与する経験値量。</p>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>上昇したレベル数。</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.myla_game.stone.Stone.lvup">
+<span class="sig-name descname"><span class="pre">lvup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/src/myla_game/stone.html#Stone.lvup"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.stone.Stone.lvup" title="Link to this definition"></a></dt>
+<dd><p>ストーンを1レベルアップさせ、オプションを強化します。
+3の倍数レベルに達した際、サブオプションが追加または強化されます。</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値<span class="colon">:</span></dt>
+<dd class="field-odd"><p>レベルアップに成功したかどうか。</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.myla_game.stone.StoneOption">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.myla_game.stone.</span></span><span class="sig-name descname"><span class="pre">StoneOption</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/stone.html#StoneOption"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.stone.StoneOption" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>ストーンが持ちうるオプション（ステータス効果）の種類を定義するEnum。</p>
+<p>各メンバーは <cite>asset/data/stone.json</cite> 内の &quot;option&quot; リストに対応しています。
+Enumの初期化時に、対応するIDのデータを読み込み、プロパティとして保持します。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.stone.StoneOption.ATK_ADD">
+<span class="sig-name descname"><span class="pre">ATK_ADD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#src.myla_game.stone.StoneOption.ATK_ADD" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.stone.StoneOption.ATK_RATE">
+<span class="sig-name descname"><span class="pre">ATK_RATE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#src.myla_game.stone.StoneOption.ATK_RATE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.stone.StoneOption.CRIT_DMG">
+<span class="sig-name descname"><span class="pre">CRIT_DMG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">7</span></em><a class="headerlink" href="#src.myla_game.stone.StoneOption.CRIT_DMG" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.stone.StoneOption.CRIT_RATE">
+<span class="sig-name descname"><span class="pre">CRIT_RATE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">6</span></em><a class="headerlink" href="#src.myla_game.stone.StoneOption.CRIT_RATE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.stone.StoneOption.DEF_ADD">
+<span class="sig-name descname"><span class="pre">DEF_ADD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#src.myla_game.stone.StoneOption.DEF_ADD" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.stone.StoneOption.DEF_RATE">
+<span class="sig-name descname"><span class="pre">DEF_RATE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></em><a class="headerlink" href="#src.myla_game.stone.StoneOption.DEF_RATE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.stone.StoneOption.HP_ADD">
+<span class="sig-name descname"><span class="pre">HP_ADD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#src.myla_game.stone.StoneOption.HP_ADD" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.stone.StoneOption.HP_RATE">
+<span class="sig-name descname"><span class="pre">HP_RATE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#src.myla_game.stone.StoneOption.HP_RATE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.stone.StoneOption.SPD">
+<span class="sig-name descname"><span class="pre">SPD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">8</span></em><a class="headerlink" href="#src.myla_game.stone.StoneOption.SPD" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.myla_game.stone.StoneOption.get_by_id">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_by_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/stone.html#StoneOption.get_by_id"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.stone.StoneOption.get_by_id" title="Link to this definition"></a></dt>
+<dd><p>IDからStoneOptionメンバーを取得します。</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.myla_game.stone.StoneSet">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.myla_game.stone.</span></span><span class="sig-name descname"><span class="pre">StoneSet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/stone.html#StoneSet"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.stone.StoneSet" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>ストーンのセット効果を定義するEnum。
+同じセットのストーンを3つ装備すると、特定のステータスが15%上昇します。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.stone.StoneSet.ATK">
+<span class="sig-name descname"><span class="pre">ATK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#src.myla_game.stone.StoneSet.ATK" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.stone.StoneSet.DEF">
+<span class="sig-name descname"><span class="pre">DEF</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#src.myla_game.stone.StoneSet.DEF" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.stone.StoneSet.HP">
+<span class="sig-name descname"><span class="pre">HP</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#src.myla_game.stone.StoneSet.HP" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.myla_game.stone.StoneSet.get_by_id">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_by_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/stone.html#StoneSet.get_by_id"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.stone.StoneSet.get_by_id" title="Link to this definition"></a></dt>
+<dd><p>IDからStoneSetメンバーを取得します。</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.myla_game.stone.StoneType">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.myla_game.stone.</span></span><span class="sig-name descname"><span class="pre">StoneType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/stone.html#StoneType"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.stone.StoneType" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>ストーンの部位（タイプ）を定義するEnum。
+部位によって、出現しうるメインオプションとサブオプションが異なります。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.stone.StoneType.BROOCH">
+<span class="sig-name descname"><span class="pre">BROOCH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#src.myla_game.stone.StoneType.BROOCH" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.stone.StoneType.CRYSTAL">
+<span class="sig-name descname"><span class="pre">CRYSTAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#src.myla_game.stone.StoneType.CRYSTAL" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.stone.StoneType.JEWEL">
+<span class="sig-name descname"><span class="pre">JEWEL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#src.myla_game.stone.StoneType.JEWEL" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.stone.StoneType.ORB">
+<span class="sig-name descname"><span class="pre">ORB</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#src.myla_game.stone.StoneType.ORB" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.myla_game.stone.StoneType.get_by_id">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_by_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/stone.html#StoneType.get_by_id"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.stone.StoneType.get_by_id" title="Link to this definition"></a></dt>
+<dd><p>IDからStoneTypeメンバーを取得します。</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.myla_game.stone.SubOptionData">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.myla_game.stone.</span></span><span class="sig-name descname"><span class="pre">SubOptionData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">option</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#src.myla_game.stone.StoneOption" title="src.myla_game.stone.StoneOption"><span class="pre">StoneOption</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/stone.html#SubOptionData"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.stone.SubOptionData" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <a class="reference internal" href="#src.myla_game.stone.OptionData" title="src.myla_game.stone.OptionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">OptionData</span></code></a></p>
+<p>ストーンのサブオプションを表すクラス。</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.myla_game.stone.SubOptionData.enhance">
+<span class="sig-name descname"><span class="pre">enhance</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/stone.html#SubOptionData.enhance"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.stone.SubOptionData.enhance" title="Link to this definition"></a></dt>
+<dd><p>オプションを1段階強化します。ランダムな上昇値が加算されます。</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.myla_game.trigger_type">
+<span id="src-myla-game-trigger-type-module"></span><h2>src.myla_game.trigger_type module<a class="headerlink" href="#module-src.myla_game.trigger_type" title="Link to this heading"></a></h2>
+<p>スキルがどのような状況で発動するかを定義するEnumを格納するモジュール。</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.myla_game.trigger_type.TriggerType">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.myla_game.trigger_type.</span></span><span class="sig-name descname"><span class="pre">TriggerType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/trigger_type.html#TriggerType"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.trigger_type.TriggerType" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>スキルが発動するきっかけ（トリガー）を表す列挙型。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.trigger_type.TriggerType.ATTACK">
+<span class="sig-name descname"><span class="pre">ATTACK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#src.myla_game.trigger_type.TriggerType.ATTACK" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.trigger_type.TriggerType.CRIT">
+<span class="sig-name descname"><span class="pre">CRIT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#src.myla_game.trigger_type.TriggerType.CRIT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.trigger_type.TriggerType.DAMAGED">
+<span class="sig-name descname"><span class="pre">DAMAGED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#src.myla_game.trigger_type.TriggerType.DAMAGED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.trigger_type.TriggerType.DEAD">
+<span class="sig-name descname"><span class="pre">DEAD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></em><a class="headerlink" href="#src.myla_game.trigger_type.TriggerType.DEAD" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.trigger_type.TriggerType.DEFEAT">
+<span class="sig-name descname"><span class="pre">DEFEAT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">7</span></em><a class="headerlink" href="#src.myla_game.trigger_type.TriggerType.DEFEAT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.trigger_type.TriggerType.HEAL">
+<span class="sig-name descname"><span class="pre">HEAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#src.myla_game.trigger_type.TriggerType.HEAL" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.myla_game.trigger_type.TriggerType.HEALED">
+<span class="sig-name descname"><span class="pre">HEALED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">6</span></em><a class="headerlink" href="#src.myla_game.trigger_type.TriggerType.HEALED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.myla_game.utils">
+<span id="src-myla-game-utils-module"></span><h2>src.myla_game.utils module<a class="headerlink" href="#module-src.myla_game.utils" title="Link to this heading"></a></h2>
+<p>ゲームのデータアクセスレイヤー(DAL)として機能するユーティリティモジュール。</p>
+<p>このモジュールは、プレイヤーの動的データ（data/<em>.json）および
+ゲームの静的データ（asset/data/</em>.json）の読み込み、書き込み、更新を
+一元的に管理する関数群を提供します。</p>
+<p><a href="#id7"><span class="problematic" id="id8">`</span></a>cog`層や他の`myla_game`層のモジュールは、原則としてこのモジュールを通じて
+データにアクセスすることで、データ永続化のロジックを抽象化します。</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="src.myla_game.utils.get_character_data_by_id">
+<span class="sig-prename descclassname"><span class="pre">src.myla_game.utils.</span></span><span class="sig-name descname"><span class="pre">get_character_data_by_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="_modules/src/myla_game/utils.html#get_character_data_by_id"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.utils.get_character_data_by_id" title="Link to this definition"></a></dt>
+<dd><p>指定されたIDを持つキャラクターの静的データを <cite>asset/data/character.json</cite> から取得します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>id</strong> (<em>int</em>) -- 取得したいキャラクターのID。</p>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>見つかったキャラクターのデータ辞書。見つからない場合はNone。</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.myla_game.utils.get_item_data_by_id">
+<span class="sig-prename descclassname"><span class="pre">src.myla_game.utils.</span></span><span class="sig-name descname"><span class="pre">get_item_data_by_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="_modules/src/myla_game/utils.html#get_item_data_by_id"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.utils.get_item_data_by_id" title="Link to this definition"></a></dt>
+<dd><p>指定されたIDを持つアイテムの静的データを <cite>asset/data/item.json</cite> から取得します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>id</strong> (<em>int</em>) -- 取得したいアイテムのID。</p>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>見つかったアイテムのデータ辞書。見つからない場合はNone。</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.myla_game.utils.get_player_all_parties">
+<span class="sig-prename descclassname"><span class="pre">src.myla_game.utils.</span></span><span class="sig-name descname"><span class="pre">get_player_all_parties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/utils.html#get_player_all_parties"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.utils.get_player_all_parties" title="Link to this definition"></a></dt>
+<dd><p>プレイヤーが所持するすべてのパーティーを取得します。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.myla_game.utils.get_player_character">
+<span class="sig-prename descclassname"><span class="pre">src.myla_game.utils.</span></span><span class="sig-name descname"><span class="pre">get_player_character</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uuid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weapon_uuid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/utils.html#get_player_character"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.utils.get_player_character" title="Link to this definition"></a></dt>
+<dd><p>プレイヤーが所持する特定のキャラクターのインスタンスを生成して返します。
+武器UUIDが指定された場合は、その武器も装備した状態でインスタンス化します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user_id</strong> (<em>int</em>) -- プレイヤーのDiscordユーザーID。</p></li>
+<li><p><strong>uuid</strong> (<em>str</em>) -- 取得したいキャラクターのユニークID。</p></li>
+<li><p><strong>weapon_uuid</strong> (<em>str</em><em> | </em><em>None</em><em>, </em><em>optional</em>) -- 装備させる武器のユニークID。Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>生成されたキャラクターオブジェクト。見つからない場合はNone。</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#src.myla_game.character.PlayerCharacter" title="src.myla_game.character.PlayerCharacter">character.PlayerCharacter</a> | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.myla_game.utils.get_player_party">
+<span class="sig-prename descclassname"><span class="pre">src.myla_game.utils.</span></span><span class="sig-name descname"><span class="pre">get_player_party</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uuid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/utils.html#get_player_party"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.utils.get_player_party" title="Link to this definition"></a></dt>
+<dd><p>プレイヤーが編成した特定のパーティーのインスタンスを生成して返します。
+パーティー内のキャラクターや装備も再帰的に読み込み、完全にインスタンス化します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user_id</strong> (<em>int</em>) -- プレイヤーのDiscordユーザーID。</p></li>
+<li><p><strong>uuid</strong> (<em>str</em>) -- 取得したいパーティーのユニークID。</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>生成されたパーティーオブジェクト。見つからない場合はNone。</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#src.myla_game.party.PlayerParty" title="src.myla_game.party.PlayerParty">party.PlayerParty</a> | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.myla_game.utils.get_player_stone">
+<span class="sig-prename descclassname"><span class="pre">src.myla_game.utils.</span></span><span class="sig-name descname"><span class="pre">get_player_stone</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uuid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/utils.html#get_player_stone"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.utils.get_player_stone" title="Link to this definition"></a></dt>
+<dd><p>プレイヤーが所持する特定のストーンのインスタンスを生成して返します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user_id</strong> (<em>int</em>) -- プレイヤーのDiscordユーザーID。</p></li>
+<li><p><strong>uuid</strong> (<em>str</em>) -- 取得したいストーンのユニークID。</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>生成されたストーンオブジェクト。見つからない場合はNone。</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#src.myla_game.stone.Stone" title="src.myla_game.stone.Stone">stone.Stone</a> | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.myla_game.utils.get_player_weapon">
+<span class="sig-prename descclassname"><span class="pre">src.myla_game.utils.</span></span><span class="sig-name descname"><span class="pre">get_player_weapon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uuid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/utils.html#get_player_weapon"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.utils.get_player_weapon" title="Link to this definition"></a></dt>
+<dd><p>プレイヤーが所持する特定の武器のインスタンスを生成して返します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user_id</strong> (<em>int</em>) -- プレイヤーのDiscordユーザーID。</p></li>
+<li><p><strong>uuid</strong> (<em>str</em>) -- 取得したい武器のユニークID。</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>生成された武器オブジェクト。見つからない場合はNone。</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#src.myla_game.weapon.Weapon" title="src.myla_game.weapon.Weapon">weapon.Weapon</a> | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.myla_game.utils.get_stone_option_data_by_id">
+<span class="sig-prename descclassname"><span class="pre">src.myla_game.utils.</span></span><span class="sig-name descname"><span class="pre">get_stone_option_data_by_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="_modules/src/myla_game/utils.html#get_stone_option_data_by_id"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.utils.get_stone_option_data_by_id" title="Link to this definition"></a></dt>
+<dd><p>指定されたIDを持つストーンオプションの静的データを <cite>asset/data/stone.json</cite> から取得します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>id</strong> (<em>int</em>) -- 取得したいストーンオプションのID。</p>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>見つかったストーンオプションのデータ辞書。見つからない場合はNone。</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.myla_game.utils.get_weapon_data_by_id">
+<span class="sig-prename descclassname"><span class="pre">src.myla_game.utils.</span></span><span class="sig-name descname"><span class="pre">get_weapon_data_by_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="_modules/src/myla_game/utils.html#get_weapon_data_by_id"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.utils.get_weapon_data_by_id" title="Link to this definition"></a></dt>
+<dd><p>指定されたIDを持つ武器の静的データを <cite>asset/data/weapon.json</cite> から取得します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>id</strong> (<em>int</em>) -- 取得したい武器のID。</p>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>見つかった武器のデータ辞書。見つからない場合はNone。</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict | None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.myla_game.utils.give_gold">
+<span class="sig-prename descclassname"><span class="pre">src.myla_game.utils.</span></span><span class="sig-name descname"><span class="pre">give_gold</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/src/myla_game/utils.html#give_gold"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.utils.give_gold" title="Link to this definition"></a></dt>
+<dd><p>プレイヤーの所持ゴールドを増減させます。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user_id</strong> (<em>int</em>) -- プレイヤーのDiscordユーザーID。</p></li>
+<li><p><strong>value</strong> (<em>int</em>) -- 増減させるゴールドの量。負の値も可。</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>操作が成功した場合はTrue。ゴールドがマイナスになるなど失敗した場合はFalse。</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.myla_game.utils.give_player_character">
+<span class="sig-prename descclassname"><span class="pre">src.myla_game.utils.</span></span><span class="sig-name descname"><span class="pre">give_player_character</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/src/myla_game/utils.html#give_player_character"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.utils.give_player_character" title="Link to this definition"></a></dt>
+<dd><p>プレイヤーにキャラクターを付与します。
+既に所持している場合は、凸数を進めます。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user_id</strong> (<em>int</em>) -- プレイヤーのDiscordユーザーID。</p></li>
+<li><p><strong>id</strong> (<em>int</em>) -- 付与するキャラクターのID。</p></li>
+<li><p><strong>value</strong> (<em>int</em>) -- 付与する数（通常は1）。</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>操作後のキャラクターの凸数 (新規獲得の場合は0)。</dt><dd><p>-1の場合はエラーまたは最大凸数を超えていることを示す。</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.myla_game.utils.give_player_party">
+<span class="sig-prename descclassname"><span class="pre">src.myla_game.utils.</span></span><span class="sig-name descname"><span class="pre">give_player_party</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">party_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#src.myla_game.party.Party" title="src.myla_game.party.Party"><span class="pre">Party</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/utils.html#give_player_party"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.utils.give_player_party" title="Link to this definition"></a></dt>
+<dd><p>プレイヤーのパーティー編成を保存または更新します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user_id</strong> (<em>int</em>) -- プレイヤーのDiscordユーザーID。</p></li>
+<li><p><strong>party_obj</strong> (<a class="reference internal" href="#src.myla_game.party.Party" title="src.myla_game.party.Party"><em>party.Party</em></a>) -- 保存するPartyオブジェクト。</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.myla_game.utils.give_player_stone">
+<span class="sig-prename descclassname"><span class="pre">src.myla_game.utils.</span></span><span class="sig-name descname"><span class="pre">give_player_stone</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stone_obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#src.myla_game.stone.Stone" title="src.myla_game.stone.Stone"><span class="pre">Stone</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/utils.html#give_player_stone"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.utils.give_player_stone" title="Link to this definition"></a></dt>
+<dd><p>プレイヤーにストーンを追加または更新します。
+同じUUIDのストーンが既に存在する場合は上書きされ、レベルやロック状態の更新に使用できます。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user_id</strong> (<em>int</em>) -- プレイヤーのDiscordユーザーID。</p></li>
+<li><p><strong>stone_obj</strong> (<a class="reference internal" href="#src.myla_game.stone.Stone" title="src.myla_game.stone.Stone"><em>stone.Stone</em></a>) -- 保存するStoneオブジェクト。</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.myla_game.utils.has_player_character_by_id">
+<span class="sig-prename descclassname"><span class="pre">src.myla_game.utils.</span></span><span class="sig-name descname"><span class="pre">has_player_character_by_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/src/myla_game/utils.html#has_player_character_by_id"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.utils.has_player_character_by_id" title="Link to this definition"></a></dt>
+<dd><p>プレイヤーが指定されたIDのキャラクターを所持しているかを確認します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user_id</strong> (<em>int</em>) -- プレイヤーのDiscordユーザーID。</p></li>
+<li><p><strong>id</strong> (<em>int</em>) -- 確認したいキャラクターのID。</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>所持している場合はTrue、そうでない場合はFalse。</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-src.myla_game.weapon">
+<span id="src-myla-game-weapon-module"></span><h2>src.myla_game.weapon module<a class="headerlink" href="#module-src.myla_game.weapon" title="Link to this heading"></a></h2>
+<p>キャラクターが装備する武器を定義するモジュール。</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.myla_game.weapon.Weapon">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.myla_game.weapon.</span></span><span class="sig-name descname"><span class="pre">Weapon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lv</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uuid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/src/myla_game/weapon.html#Weapon"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.weapon.Weapon" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>キャラクターが装備する武器を表すクラス。</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.myla_game.weapon.Weapon.get_status">
+<span class="sig-name descname"><span class="pre">get_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">status_enum</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#src.myla_game.status.Status" title="src.myla_game.status.Status"><span class="pre">Status</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/src/myla_game/weapon.html#Weapon.get_status"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#src.myla_game.weapon.Weapon.get_status" title="Link to this definition"></a></dt>
+<dd><p>この武器が持つ特定のステータス値を返します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>status_enum</strong> (<a class="reference internal" href="#src.myla_game.status.Status" title="src.myla_game.status.Status"><em>status.Status</em></a>) -- 取得したいステータス。</p>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>ステータス値。</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-src.myla_game">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-src.myla_game" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="src.cog.html" class="btn btn-neutral float-left" title="src.cog package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="src.utils.html" class="btn btn-neutral float-right" title="src.utils package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, qr0.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
