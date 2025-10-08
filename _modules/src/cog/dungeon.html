@@ -1,0 +1,342 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="ja" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.cog.dungeon &mdash; myla_game 1.6 ドキュメント</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=044f9cdb"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/translations.js?v=4755f45a"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../../genindex.html" />
+    <link rel="search" title="検索" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            myla_game
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../src.html">src package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">myla_game</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">モジュールコード</a></li>
+      <li class="breadcrumb-item active">src.cog.dungeon</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>src.cog.dungeon のソースコード</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">ダンジョンへの挑戦に関するコマンドとロジックを管理するCog。</span>
+<span class="sd">`cog.battle.PvE`クラスを継承して、ダンジョンごとの敵構成、消費スタミナ、報酬などを定義します。</span>
+<span class="sd">スタミナの自然回復もバックグラウンドタスクとして管理します。</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">discord</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">discord</span><span class="w"> </span><span class="kn">import</span> <span class="n">app_commands</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">discord.ext</span><span class="w"> </span><span class="kn">import</span> <span class="n">commands</span><span class="p">,</span> <span class="n">tasks</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">utils</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..myla_game</span><span class="w"> </span><span class="kn">import</span> <span class="n">myla_game</span> <span class="k">as</span> <span class="n">game</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.battle</span><span class="w"> </span><span class="kn">import</span> <span class="n">PvE</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">aiofiles</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+
+
+<div class="viewcode-block" id="PvECharaDungeon">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.dungeon.PvECharaDungeon">[ドキュメント]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PvECharaDungeon</span><span class="p">(</span><span class="n">PvE</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;キャラクター育成素材ダンジョンの戦闘フローを管理するクラス。&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="PvECharaDungeon.end">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.dungeon.PvECharaDungeon.end">[ドキュメント]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">end</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;戦闘終了時の処理をオーバーライド。キャラクター育成素材を報酬として付与します。&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">battle</span><span class="o">.</span><span class="n">winner</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">player_party</span><span class="p">:</span>
+            <span class="c1"># スタミナ消費処理</span>
+            <span class="k">if</span> <span class="n">game</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">give_stamina</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">player</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="o">-</span><span class="mi">20</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;スタミナが足りないため、報酬を獲得できません&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># 報酬計算と付与</span>
+                <span class="n">count</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="mi">50</span> <span class="o">*</span> <span class="mf">1.01</span> <span class="o">**</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">enemy_party</span><span class="o">.</span><span class="n">characters</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lv</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+                <span class="n">game</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">give_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">player</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">count</span><span class="p">)</span>
+                <span class="n">item_name</span> <span class="o">=</span> <span class="n">game</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">get_item_data_by_id</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+                <span class="n">description</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">item_name</span><span class="si">}</span><span class="s1"> を **</span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s1">** 個 獲得した&#39;</span>
+
+            <span class="n">embed</span> <span class="o">=</span> <span class="n">discord</span><span class="o">.</span><span class="n">Embed</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;勝利！&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">discord</span><span class="o">.</span><span class="n">Colour</span><span class="o">.</span><span class="n">from_rgb</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">embed</span> <span class="o">=</span> <span class="n">discord</span><span class="o">.</span><span class="n">Embed</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;敗北&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;再挑戦しよう&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">discord</span><span class="o">.</span><span class="n">Colour</span><span class="o">.</span><span class="n">from_rgb</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">interaction</span><span class="o">.</span><span class="n">edit_original_response</span><span class="p">(</span><span class="n">embed</span><span class="o">=</span><span class="n">embed</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="n">PvECharaDungeon</span><span class="o">.</span><span class="n">players_id</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">player</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="k">del</span> <span class="bp">self</span></div>
+
+
+
+<div class="viewcode-block" id="PvECharaDungeon.start_battle">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.dungeon.PvECharaDungeon.start_battle">[ドキュメント]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">start_battle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interaction</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">Interaction</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;戦闘開始処理をオーバーライド。このダンジョン固有の敵パーティーを生成します。&quot;&quot;&quot;</span>
+        <span class="c1"># プレイヤーのパーティーレベルに合わせて敵のレベルを決定</span>
+        <span class="n">party</span> <span class="o">=</span> <span class="n">game</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">get_player_party</span><span class="p">(</span><span class="n">interaction</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">lv</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">chara</span><span class="o">.</span><span class="n">lv</span> <span class="k">for</span> <span class="n">chara</span> <span class="ow">in</span> <span class="n">party</span><span class="o">.</span><span class="n">characters</span><span class="p">)</span>
+
+        <span class="c1"># 敵パーティーを生成</span>
+        <span class="n">enemies_object</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">game</span><span class="o">.</span><span class="n">EnemyCharacter</span><span class="p">(</span><span class="mi">20001</span><span class="p">,</span> <span class="n">lv</span><span class="p">),</span>
+            <span class="n">game</span><span class="o">.</span><span class="n">EnemyCharacter</span><span class="p">(</span><span class="mi">20002</span><span class="p">,</span> <span class="n">lv</span><span class="p">),</span>
+            <span class="n">game</span><span class="o">.</span><span class="n">EnemyCharacter</span><span class="p">(</span><span class="mi">20001</span><span class="p">,</span> <span class="n">lv</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enemy_party</span> <span class="o">=</span> <span class="n">game</span><span class="o">.</span><span class="n">EnemyParty</span><span class="p">(</span><span class="n">enemies_object</span><span class="p">)</span>
+
+        <span class="c1"># 親クラスの戦闘開始処理を呼び出す</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">start_battle</span><span class="p">(</span><span class="n">interaction</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="PvEWeaponDungeon">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.dungeon.PvEWeaponDungeon">[ドキュメント]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PvEWeaponDungeon</span><span class="p">(</span><span class="n">PvE</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;武器育成素材ダンジョンの戦闘フローを管理するクラス。&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="PvEWeaponDungeon.end">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.dungeon.PvEWeaponDungeon.end">[ドキュメント]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">end</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;戦闘終了時の処理をオーバーライド。武器育成素材を報酬として付与します。&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">battle</span><span class="o">.</span><span class="n">winner</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">player_party</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">game</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">give_stamina</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">player</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="o">-</span><span class="mi">20</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;スタミナが足りないため、報酬を獲得できません&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">count</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="mi">50</span> <span class="o">*</span> <span class="mf">1.01</span> <span class="o">**</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">enemy_party</span><span class="o">.</span><span class="n">characters</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lv</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+                <span class="n">game</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">give_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">player</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">count</span><span class="p">)</span>
+                <span class="n">item_name</span> <span class="o">=</span> <span class="n">game</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">get_item_data_by_id</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+                <span class="n">description</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">item_name</span><span class="si">}</span><span class="s1"> を **</span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s1">** 個 獲得した&#39;</span>
+
+            <span class="n">embed</span> <span class="o">=</span> <span class="n">discord</span><span class="o">.</span><span class="n">Embed</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;勝利！&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">discord</span><span class="o">.</span><span class="n">Colour</span><span class="o">.</span><span class="n">from_rgb</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">embed</span> <span class="o">=</span> <span class="n">discord</span><span class="o">.</span><span class="n">Embed</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;敗北&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;再挑戦しよう&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">discord</span><span class="o">.</span><span class="n">Colour</span><span class="o">.</span><span class="n">from_rgb</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">interaction</span><span class="o">.</span><span class="n">edit_original_response</span><span class="p">(</span><span class="n">embed</span><span class="o">=</span><span class="n">embed</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="n">PvEWeaponDungeon</span><span class="o">.</span><span class="n">players_id</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">player</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="k">del</span> <span class="bp">self</span></div>
+
+
+
+<div class="viewcode-block" id="PvEWeaponDungeon.start_battle">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.dungeon.PvEWeaponDungeon.start_battle">[ドキュメント]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">start_battle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interaction</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">Interaction</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;戦闘開始処理をオーバーライド。このダンジョン固有の敵パーティーを生成します。&quot;&quot;&quot;</span>
+        <span class="n">party</span> <span class="o">=</span> <span class="n">game</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">get_player_party</span><span class="p">(</span><span class="n">interaction</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">lv</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">chara</span><span class="o">.</span><span class="n">lv</span> <span class="k">for</span> <span class="n">chara</span> <span class="ow">in</span> <span class="n">party</span><span class="o">.</span><span class="n">characters</span><span class="p">)</span>
+
+        <span class="n">enemies_object</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">game</span><span class="o">.</span><span class="n">EnemyCharacter</span><span class="p">(</span><span class="mi">20002</span><span class="p">,</span> <span class="n">lv</span><span class="p">),</span>
+            <span class="n">game</span><span class="o">.</span><span class="n">EnemyCharacter</span><span class="p">(</span><span class="mi">20002</span><span class="p">,</span> <span class="n">lv</span><span class="p">),</span>
+            <span class="n">game</span><span class="o">.</span><span class="n">EnemyCharacter</span><span class="p">(</span><span class="mi">20002</span><span class="p">,</span> <span class="n">lv</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enemy_party</span> <span class="o">=</span> <span class="n">game</span><span class="o">.</span><span class="n">EnemyParty</span><span class="p">(</span><span class="n">enemies_object</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">start_battle</span><span class="p">(</span><span class="n">interaction</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span></div>
+</div>
+
+    
+
+<div class="viewcode-block" id="PvEStoneDungeon">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.dungeon.PvEStoneDungeon">[ドキュメント]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PvEStoneDungeon</span><span class="p">(</span><span class="n">PvE</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;ストーン獲得ダンジョンの戦闘フローを管理するクラス。&quot;&quot;&quot;</span>
+
+    <span class="c1"># ... (ViewSelectStone, ViewStoneクラスの定義) ...</span>
+    <span class="c1"># これらのViewは、報酬として得たストーンをその場で確認・ロック・粉砕するためのUIを提供します。</span>
+    <span class="c1"># inventory.pyのStoneInventory内のViewと似た構造をしています。</span>
+    
+<div class="viewcode-block" id="PvEStoneDungeon.end">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.dungeon.PvEStoneDungeon.end">[ドキュメント]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">end</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;戦闘終了時の処理をオーバーライド。ストーンとストーン強化素材を報酬として付与します。&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">battle</span><span class="o">.</span><span class="n">winner</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">player_party</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">game</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">give_stamina</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">player</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="o">-</span><span class="mi">30</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;スタミナが足りないため、報酬を獲得できません&quot;</span>
+                <span class="n">embed</span> <span class="o">=</span> <span class="n">discord</span><span class="o">.</span><span class="n">Embed</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;勝利！&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">discord</span><span class="o">.</span><span class="n">Colour</span><span class="o">.</span><span class="n">from_rgb</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">))</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">interaction</span><span class="o">.</span><span class="n">edit_original_response</span><span class="p">(</span><span class="n">embed</span><span class="o">=</span><span class="n">embed</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># ストーン強化素材を付与</span>
+                <span class="n">game</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">give_item</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">player</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">25</span><span class="p">)</span>
+
+                <span class="c1"># ランダムなストーンを複数個生成・付与</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">stone_list</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">choices</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">])[</span><span class="mi">0</span><span class="p">]):</span>
+                    <span class="n">stone</span> <span class="o">=</span> <span class="n">game</span><span class="o">.</span><span class="n">Stone</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">game</span><span class="o">.</span><span class="n">StoneSet</span><span class="p">)),</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">game</span><span class="o">.</span><span class="n">StoneType</span><span class="p">)))</span>
+                    <span class="n">game</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">give_player_stone</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">player</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">stone</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">stone_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stone</span><span class="p">)</span>
+                
+                <span class="c1"># 獲得したストーンを確認するためのUIを表示</span>
+                <span class="n">view</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ViewSelectStone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stone_list</span><span class="p">)</span>
+                <span class="n">item_name</span> <span class="o">=</span> <span class="n">game</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">get_item_data_by_id</span><span class="p">(</span><span class="mi">2</span><span class="p">)[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+                <span class="n">description</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">item_name</span><span class="si">}</span><span class="s1"> を **25** 個 獲得した&#39;</span>
+                <span class="n">embed</span> <span class="o">=</span> <span class="n">discord</span><span class="o">.</span><span class="n">Embed</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;勝利！&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">discord</span><span class="o">.</span><span class="n">Colour</span><span class="o">.</span><span class="n">from_rgb</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">))</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">interaction</span><span class="o">.</span><span class="n">edit_original_response</span><span class="p">(</span><span class="n">embed</span><span class="o">=</span><span class="n">embed</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="n">view</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">embed</span> <span class="o">=</span> <span class="n">discord</span><span class="o">.</span><span class="n">Embed</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;敗北&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;再挑戦しよう&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">discord</span><span class="o">.</span><span class="n">Colour</span><span class="o">.</span><span class="n">from_rgb</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">interaction</span><span class="o">.</span><span class="n">edit_original_response</span><span class="p">(</span><span class="n">embed</span><span class="o">=</span><span class="n">embed</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        
+        <span class="n">PvEStoneDungeon</span><span class="o">.</span><span class="n">players_id</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">player</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="k">del</span> <span class="bp">self</span></div>
+
+
+
+<div class="viewcode-block" id="PvEStoneDungeon.start_battle">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.dungeon.PvEStoneDungeon.start_battle">[ドキュメント]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">start_battle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interaction</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">Interaction</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;戦闘開始処理をオーバーライド。固定レベルの敵パーティーを生成します。&quot;&quot;&quot;</span>
+        <span class="n">enemies_object</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">game</span><span class="o">.</span><span class="n">EnemyCharacter</span><span class="p">(</span><span class="mi">20002</span><span class="p">,</span> <span class="mi">30</span><span class="p">),</span>
+            <span class="n">game</span><span class="o">.</span><span class="n">EnemyCharacter</span><span class="p">(</span><span class="mi">20001</span><span class="p">,</span> <span class="mi">35</span><span class="p">),</span>
+            <span class="n">game</span><span class="o">.</span><span class="n">EnemyCharacter</span><span class="p">(</span><span class="mi">20002</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enemy_party</span> <span class="o">=</span> <span class="n">game</span><span class="o">.</span><span class="n">EnemyParty</span><span class="p">(</span><span class="n">enemies_object</span><span class="p">)</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">start_battle</span><span class="p">(</span><span class="n">interaction</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="DungeonCmd">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.dungeon.DungeonCmd">[ドキュメント]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DungeonCmd</span><span class="p">(</span><span class="n">commands</span><span class="o">.</span><span class="n">Cog</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;ダンジョン関連のスラッシュコマンドを定義するCog。&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bot</span><span class="p">:</span> <span class="n">commands</span><span class="o">.</span><span class="n">Bot</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Cogを初期化し、スタミナ回復タスクを開始します。&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bot</span> <span class="o">=</span> <span class="n">bot</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stamina_charge</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+
+    <span class="nd">@app_commands</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;dungeon_character&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;キャラクター育成ダンジョンに潜る&quot;</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">dungeon_character</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">int</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">Interaction</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;キャラクター育成ダンジョンへの挑戦を開始します。&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">game</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">get_player_stamina</span><span class="p">(</span><span class="nb">int</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">20</span><span class="p">:</span>
+            <span class="k">await</span> <span class="nb">int</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="s2">&quot;スタミナが足りません&quot;</span><span class="p">,</span> <span class="n">ephemeral</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">await</span> <span class="n">PvECharaDungeon</span><span class="p">()</span><span class="o">.</span><span class="n">select_party</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+
+    <span class="nd">@app_commands</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;dungeon_weapon&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;武器育成ダンジョンに潜る&quot;</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">dungeon_weapon</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">int</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">Interaction</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;武器育成ダンジョンへの挑戦を開始します。&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">game</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">get_player_stamina</span><span class="p">(</span><span class="nb">int</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">20</span><span class="p">:</span>
+            <span class="k">await</span> <span class="nb">int</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="s2">&quot;スタミナが足りません&quot;</span><span class="p">,</span> <span class="n">ephemeral</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">await</span> <span class="n">PvEWeaponDungeon</span><span class="p">()</span><span class="o">.</span><span class="n">select_party</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+
+    <span class="nd">@app_commands</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;dungeon_stone&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;ストーン獲得ダンジョンに潜る&quot;</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">dungeon_stone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">int</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">Interaction</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;ストーン獲得ダンジョンへの挑戦を開始します。&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">game</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">get_player_stamina</span><span class="p">(</span><span class="nb">int</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">30</span><span class="p">:</span>
+            <span class="k">await</span> <span class="nb">int</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="s2">&quot;スタミナが足りません&quot;</span><span class="p">,</span> <span class="n">ephemeral</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">await</span> <span class="n">PvEStoneDungeon</span><span class="p">()</span><span class="o">.</span><span class="n">select_party</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+    
+    <span class="nd">@tasks</span><span class="o">.</span><span class="n">loop</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stamina_charge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;6分ごとに全プレイヤーのスタミナを1回復するバックグラウンドタスク。&quot;&quot;&quot;</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="n">aiofiles</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">sys</span><span class="o">.</span><span class="n">get_game_path</span><span class="p">(</span><span class="s2">&quot;data/player.json&quot;</span><span class="p">),</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="k">await</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="n">player_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">player_data</span><span class="p">:</span>
+            <span class="n">player_data</span><span class="p">[</span><span class="nb">id</span><span class="p">][</span><span class="s2">&quot;stamina&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">player_data</span><span class="p">[</span><span class="nb">id</span><span class="p">][</span><span class="s2">&quot;stamina&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">180</span><span class="p">)</span>
+
+        <span class="k">async</span> <span class="k">with</span> <span class="n">aiofiles</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">sys</span><span class="o">.</span><span class="n">get_game_path</span><span class="p">(</span><span class="s2">&quot;data/player.json&quot;</span><span class="p">),</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">player_data</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="setup">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.dungeon.setup">[ドキュメント]</a>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="n">bot</span><span class="p">:</span> <span class="n">commands</span><span class="o">.</span><span class="n">Bot</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;CogをBotに登録するためのセットアップ関数。&quot;&quot;&quot;</span>
+    <span class="k">await</span> <span class="n">bot</span><span class="o">.</span><span class="n">add_cog</span><span class="p">(</span><span class="n">DungeonCmd</span><span class="p">(</span><span class="n">bot</span><span class="p">))</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, qr0.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

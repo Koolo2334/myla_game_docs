@@ -1,0 +1,69 @@
+src.cog package
+===============
+
+Submodules
+----------
+
+src.cog.battle module
+---------------------
+
+.. automodule:: src.cog.battle
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+src.cog.debug module
+--------------------
+
+.. automodule:: src.cog.debug
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+src.cog.dungeon module
+----------------------
+
+.. automodule:: src.cog.dungeon
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+src.cog.gacha module
+--------------------
+
+.. automodule:: src.cog.gacha
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+src.cog.inventory module
+------------------------
+
+.. automodule:: src.cog.inventory
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+src.cog.other module
+--------------------
+
+.. automodule:: src.cog.other
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+src.cog.party module
+--------------------
+
+.. automodule:: src.cog.party
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: src.cog
+   :members:
+   :undoc-members:
+   :show-inheritance:

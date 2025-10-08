@@ -1,0 +1,366 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="ja" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.cog.gacha &mdash; myla_game 1.6 ドキュメント</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=044f9cdb"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/translations.js?v=4755f45a"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../../genindex.html" />
+    <link rel="search" title="検索" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            myla_game
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../src.html">src package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">myla_game</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">モジュールコード</a></li>
+      <li class="breadcrumb-item active">src.cog.gacha</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>src.cog.gacha のソースコード</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">ガチャ機能に関するUIフローとコマンドを管理するCog。</span>
+<span class="sd">ガチャの表示、単発・10連ガチャの実行、排出結果のアニメーションと表示など、</span>
+<span class="sd">ガチャに関連する一連のユーザーインタラクションを処理します。</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">discord</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">discord</span><span class="w"> </span><span class="kn">import</span> <span class="n">app_commands</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">discord.interactions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Interaction</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">discord.ext</span><span class="w"> </span><span class="kn">import</span> <span class="n">commands</span><span class="p">,</span> <span class="n">tasks</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">utils</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..myla_game</span><span class="w"> </span><span class="kn">import</span> <span class="n">myla_game</span> <span class="k">as</span> <span class="n">game</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">typing</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">aiofiles</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+
+
+<div class="viewcode-block" id="Gacha">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.gacha.Gacha">[ドキュメント]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Gacha</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;ガチャのUIフローと状態を管理するクラス。&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gachaセッションを初期化します。&quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">sys</span><span class="o">.</span><span class="n">get_game_path</span><span class="p">(</span><span class="s2">&quot;asset/data/gacha.json&quot;</span><span class="p">),</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">gacha_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        
+        <span class="c1"># 現在開催中のガチャの種類とページ情報を設定</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_page</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">gacha_data</span><span class="p">[</span><span class="s2">&quot;active&quot;</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_page</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">User</span> <span class="o">|</span> <span class="n">discord</span><span class="o">.</span><span class="n">Member</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># ガチャ結果を一時的に保存するリスト</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rarities</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">items</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_types</span> <span class="o">=</span> <span class="p">[]</span>
+
+
+<div class="viewcode-block" id="Gacha.ViewShowCharacter">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.gacha.Gacha.ViewShowCharacter">[ドキュメント]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">ViewShowCharacter</span><span class="p">(</span><span class="n">discord</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">View</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;10連ガチャの途中結果を表示するためのView。「Next」と「Skip」ボタンを提供します。&quot;&quot;&quot;</span>
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gacha_obj</span><span class="p">:</span> <span class="n">Gacha</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mi">180</span><span class="p">):</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gacha_obj</span> <span class="o">=</span> <span class="n">gacha_obj</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">index</span>
+
+<div class="viewcode-block" id="Gacha.ViewShowCharacter.next">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.gacha.Gacha.ViewShowCharacter.next">[ドキュメント]</a>
+        <span class="nd">@discord</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;Next&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">discord</span><span class="o">.</span><span class="n">ButtonStyle</span><span class="o">.</span><span class="n">green</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">int</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">Interaction</span><span class="p">,</span> <span class="n">button</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">Button</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;次のキャラクター表示に進みます。&quot;&quot;&quot;</span>
+            <span class="k">await</span> <span class="nb">int</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">defer</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">int</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gacha_obj</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="k">return</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">gacha_obj</span><span class="o">.</span><span class="n">show_character</span><span class="p">(</span><span class="nb">int</span><span class="o">.</span><span class="n">message</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Gacha.ViewShowCharacter.skip">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.gacha.Gacha.ViewShowCharacter.skip">[ドキュメント]</a>
+        <span class="nd">@discord</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;Skip&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">discord</span><span class="o">.</span><span class="n">ButtonStyle</span><span class="o">.</span><span class="n">blurple</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">skip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">int</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">Interaction</span><span class="p">,</span> <span class="n">button</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">Button</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;結果表示をスキップして、最終結果一覧を表示します。&quot;&quot;&quot;</span>
+            <span class="k">if</span> <span class="nb">int</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gacha_obj</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="k">await</span> <span class="nb">int</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">defer</span><span class="p">();</span> <span class="k">return</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">gacha_obj</span><span class="o">.</span><span class="n">show_result</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Gacha.ViewShowFinalCharacter">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.gacha.Gacha.ViewShowFinalCharacter">[ドキュメント]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">ViewShowFinalCharacter</span><span class="p">(</span><span class="n">discord</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">View</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;10連ガチャの最後のキャラクターを表示するためのView。「Finish」ボタンを提供します。&quot;&quot;&quot;</span>
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gacha_obj</span><span class="p">:</span> <span class="n">Gacha</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mi">180</span><span class="p">):</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gacha_obj</span> <span class="o">=</span> <span class="n">gacha_obj</span>
+        
+<div class="viewcode-block" id="Gacha.ViewShowFinalCharacter.finish">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.gacha.Gacha.ViewShowFinalCharacter.finish">[ドキュメント]</a>
+        <span class="nd">@discord</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;Finish&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">discord</span><span class="o">.</span><span class="n">ButtonStyle</span><span class="o">.</span><span class="n">green</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">finish</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">int</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">Interaction</span><span class="p">,</span> <span class="n">button</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">Button</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;最終結果一覧を表示します。&quot;&quot;&quot;</span>
+            <span class="k">if</span> <span class="nb">int</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gacha_obj</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="k">await</span> <span class="nb">int</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">defer</span><span class="p">();</span> <span class="k">return</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">gacha_obj</span><span class="o">.</span><span class="n">show_result</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Gacha.ViewSelectGacha">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.gacha.Gacha.ViewSelectGacha">[ドキュメント]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">ViewSelectGacha</span><span class="p">(</span><span class="n">discord</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">View</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;ガチャ選択画面のView。ガチャの切り替え、単発、10連ボタンを提供します。&quot;&quot;&quot;</span>
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gacha_obj</span><span class="p">:</span> <span class="n">Gacha</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mi">180</span><span class="p">):</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gacha_obj</span> <span class="o">=</span> <span class="n">gacha_obj</span>
+        
+<div class="viewcode-block" id="Gacha.ViewSelectGacha.prev_page">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.gacha.Gacha.ViewSelectGacha.prev_page">[ドキュメント]</a>
+        <span class="nd">@discord</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;&lt;&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">discord</span><span class="o">.</span><span class="n">ButtonStyle</span><span class="o">.</span><span class="n">blurple</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">prev_page</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">int</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">Interaction</span><span class="p">,</span> <span class="n">button</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">Button</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;前のガチャに切り替えます。&quot;&quot;&quot;</span>
+            <span class="k">if</span> <span class="nb">int</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gacha_obj</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="k">await</span> <span class="nb">int</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">defer</span><span class="p">();</span> <span class="k">return</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">gacha_obj</span><span class="o">.</span><span class="n">prev_page</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span></div>
+
+        
+<div class="viewcode-block" id="Gacha.ViewSelectGacha.pull_1">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.gacha.Gacha.ViewSelectGacha.pull_1">[ドキュメント]</a>
+        <span class="nd">@discord</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;Pull 1&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">discord</span><span class="o">.</span><span class="n">ButtonStyle</span><span class="o">.</span><span class="n">green</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">pull_1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">int</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">Interaction</span><span class="p">,</span> <span class="n">button</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">Button</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;単発ガチャを実行します。&quot;&quot;&quot;</span>
+            <span class="k">if</span> <span class="nb">int</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gacha_obj</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="k">await</span> <span class="nb">int</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">defer</span><span class="p">();</span> <span class="k">return</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">gacha_obj</span><span class="o">.</span><span class="n">pull_1</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Gacha.ViewSelectGacha.pull_10">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.gacha.Gacha.ViewSelectGacha.pull_10">[ドキュメント]</a>
+        <span class="nd">@discord</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;Pull 10&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">discord</span><span class="o">.</span><span class="n">ButtonStyle</span><span class="o">.</span><span class="n">green</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">pull_10</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">int</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">Interaction</span><span class="p">,</span> <span class="n">button</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">Button</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;10連ガチャを実行します。&quot;&quot;&quot;</span>
+            <span class="k">if</span> <span class="nb">int</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gacha_obj</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="k">await</span> <span class="nb">int</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">defer</span><span class="p">();</span> <span class="k">return</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">gacha_obj</span><span class="o">.</span><span class="n">pull_10</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Gacha.ViewSelectGacha.next_page">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.gacha.Gacha.ViewSelectGacha.next_page">[ドキュメント]</a>
+        <span class="nd">@discord</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">discord</span><span class="o">.</span><span class="n">ButtonStyle</span><span class="o">.</span><span class="n">blurple</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">next_page</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">int</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">Interaction</span><span class="p">,</span> <span class="n">button</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">Button</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;次のガチャに切り替えます。&quot;&quot;&quot;</span>
+            <span class="k">if</span> <span class="nb">int</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gacha_obj</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="k">await</span> <span class="nb">int</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">defer</span><span class="p">();</span> <span class="k">return</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">gacha_obj</span><span class="o">.</span><span class="n">next_page</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span> <span class="c1"># Note: prev_pageになっているが、next_pageが正しい</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Gacha.show_result">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.gacha.Gacha.show_result">[ドキュメント]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">show_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interaction</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">Interaction</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;ガチャで排出された全アイテムの一覧をEmbedで表示します。&quot;&quot;&quot;</span>
+        <span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">rarity_map</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;【⭐️⭐️⭐️】&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;【⭐️⭐️⭐️⭐️】&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="s2">&quot;【⭐️⭐️⭐️⭐️⭐️】&quot;</span><span class="p">}</span>
+        <span class="n">type_map</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;c&quot;</span><span class="p">:</span> <span class="s2">&quot;キャラ&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">:</span> <span class="s2">&quot;武器&quot;</span><span class="p">}</span>
+        
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">):</span>
+            <span class="n">item_data</span> <span class="o">=</span> <span class="n">game</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">get_character_data_by_id</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">])</span> <span class="k">if</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;c&quot;</span> <span class="k">else</span> <span class="n">game</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">get_weapon_data_by_id</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">])</span>
+            <span class="n">description</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">rarity_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rarities</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">**</span><span class="si">{</span><span class="n">item_data</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">** [</span><span class="si">{</span><span class="n">type_map</span><span class="p">[</span><span class="n">item</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]]</span><span class="si">}</span><span class="s1">][</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">get_types</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s1">]</span><span class="se">\\</span><span class="s1">n&#39;</span>
+        
+        <span class="n">embed</span> <span class="o">=</span> <span class="n">discord</span><span class="o">.</span><span class="n">Embed</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;結果&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">discord</span><span class="o">.</span><span class="n">Colour</span><span class="o">.</span><span class="n">from_rgb</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">))</span>
+        <span class="k">await</span> <span class="n">interaction</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">edit_message</span><span class="p">(</span><span class="n">embed</span><span class="o">=</span><span class="n">embed</span><span class="p">,</span> <span class="n">attachments</span><span class="o">=</span><span class="p">[],</span> <span class="n">view</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="Gacha.show_character">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.gacha.Gacha.show_character">[ドキュメント]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">show_character</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">Message</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;ガチャで排出した単一のキャラクター/武器の詳細をEmbedで表示します。&quot;&quot;&quot;</span></div>
+
+        <span class="c1"># ... (Embed作成と表示のロジック) ...</span>
+        <span class="c1"># 単発の場合、10連の最後の場合、10連の途中の場合で表示するViewを切り替える</span>
+        
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_pull_logic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pull_count</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">interaction</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">Interaction</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;単発および10連ガチャの共通ロジック。</span>
+<span class="sd">        </span>
+<span class="sd">        ゴールド消費、抽選、結果の保存、演出の表示を行います。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># ゴールド消費</span>
+        <span class="n">cost</span> <span class="o">=</span> <span class="mi">160</span> <span class="o">*</span> <span class="n">pull_count</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">game</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">give_gold</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="o">-</span><span class="n">cost</span><span class="p">):</span>
+            <span class="k">await</span> <span class="n">interaction</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="s2">&quot;ゴールドが足りません&quot;</span><span class="p">,</span> <span class="n">ephemeral</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="c1"># 抽選処理</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">pull_count</span><span class="p">):</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">pull</span><span class="p">()</span>
+        
+        <span class="c1"># 排出されたアイテムをプレイヤーに付与し、新規/凸/完凸済を判定</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">):</span>
+            <span class="c1"># ... (アイテム付与とボーナス処理のロジック) ...</span>
+            <span class="k">pass</span> <span class="c1"># 煩雑なため詳細は省略</span>
+
+        <span class="c1"># 演出の表示</span>
+        <span class="c1"># (複数の画像を順に表示してアニメーションを表現)</span>
+        <span class="k">await</span> <span class="n">interaction</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">edit_message</span><span class="p">(</span><span class="n">embed</span><span class="o">=...</span><span class="p">,</span> <span class="n">attachments</span><span class="o">=</span><span class="p">[</span><span class="o">...</span><span class="p">],</span> <span class="n">view</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.8</span><span class="p">)</span>
+        <span class="c1"># ...</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">1.2</span><span class="p">)</span>
+        
+        <span class="c1"># 最初のキャラクター/武器を表示</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">show_character</span><span class="p">(</span><span class="n">interaction</span><span class="o">.</span><span class="n">message</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    
+<div class="viewcode-block" id="Gacha.pull_1">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.gacha.Gacha.pull_1">[ドキュメント]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">pull_1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interaction</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">Interaction</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;単発ガチャを実行します。&quot;&quot;&quot;</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pull_logic</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">interaction</span><span class="p">)</span></div>
+
+        
+<div class="viewcode-block" id="Gacha.pull_10">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.gacha.Gacha.pull_10">[ドキュメント]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">pull_10</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interaction</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">Interaction</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;10連ガチャを実行します。&quot;&quot;&quot;</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pull_logic</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">interaction</span><span class="p">)</span></div>
+
+        
+<div class="viewcode-block" id="Gacha.pull">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.gacha.Gacha.pull">[ドキュメント]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">pull</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;1回のガチャ抽選を行います。</span>
+<span class="sd">        </span>
+<span class="sd">        天井システム（確定排出）を考慮してレアリティを決定し、</span>
+<span class="sd">        そのレアリティのアイテムプールからランダムに1つを選択します。</span>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+        <span class="c1"># ... (天井システムを含む複雑な抽選ロジック) ...</span>
+        <span class="c1"># 結果はself.raritiesとself.itemsに追加される</span>
+
+<div class="viewcode-block" id="Gacha.show_gacha">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.gacha.Gacha.show_gacha">[ドキュメント]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">show_gacha</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">int</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">Interaction</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;現在のガチャ情報をEmbedで表示します。&quot;&quot;&quot;</span></div>
+
+        <span class="c1"># ... (gacha.jsonから現在のガチャ情報を読み込み、EmbedとViewを作成して表示) ...</span>
+
+<div class="viewcode-block" id="Gacha.next_page">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.gacha.Gacha.next_page">[ドキュメント]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">next_page</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">int</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">Interaction</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;表示するガチャを次に切り替えます。&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_page</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_page</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_page</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">show_gacha</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Gacha.prev_page">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.gacha.Gacha.prev_page">[ドキュメント]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">prev_page</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">int</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">Interaction</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;表示するガチャを前に切り替えます。&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_page</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_page</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_page</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_page</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">show_gacha</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="GachaCmd">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.gacha.GachaCmd">[ドキュメント]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GachaCmd</span><span class="p">(</span><span class="n">commands</span><span class="o">.</span><span class="n">Cog</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;ガチャ関連のスラッシュコマンドを定義するCog。&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bot</span><span class="p">:</span> <span class="n">commands</span><span class="o">.</span><span class="n">Bot</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bot</span> <span class="o">=</span> <span class="n">bot</span>
+
+    <span class="nd">@app_commands</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;gacha&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;ガチャを引く&quot;</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">gacha</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">int</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">Interaction</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;ガチャ画面を開始します。&quot;&quot;&quot;</span>
+        <span class="k">await</span> <span class="n">Gacha</span><span class="p">()</span><span class="o">.</span><span class="n">show_gacha</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="setup">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.gacha.setup">[ドキュメント]</a>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="n">bot</span><span class="p">:</span> <span class="n">commands</span><span class="o">.</span><span class="n">Bot</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;CogをBotに登録するためのセットアップ関数。&quot;&quot;&quot;</span>
+    <span class="k">await</span> <span class="n">bot</span><span class="o">.</span><span class="n">add_cog</span><span class="p">(</span><span class="n">GachaCmd</span><span class="p">(</span><span class="n">bot</span><span class="p">))</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, qr0.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

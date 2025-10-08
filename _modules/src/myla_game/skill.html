@@ -1,0 +1,479 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="ja" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.myla_game.skill &mdash; myla_game 1.6 ドキュメント</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=044f9cdb"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/translations.js?v=4755f45a"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../../genindex.html" />
+    <link rel="search" title="検索" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            myla_game
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../src.html">src package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">myla_game</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">モジュールコード</a></li>
+      <li class="breadcrumb-item active">src.myla_game.skill</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>src.myla_game.skill のソースコード</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">ゲーム内に登場するすべてのスキル（武器スキル、ジョブスキルなど）を定義するモジュール。</span>
+
+<span class="sd">`Skill` Enumは、各スキルのID、名前、トリガー条件、そして具体的な効果を実装した関数を</span>
+<span class="sd">一元管理します。これにより、スキルデータとロジックが密結合し、管理が容易になります。</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">enum</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">operator</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">trigger_type</span><span class="p">,</span> <span class="n">action_data</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span> <span class="n">skill_data</span><span class="p">,</span> <span class="n">effect</span><span class="p">,</span> <span class="n">effect_type</span><span class="p">,</span> <span class="n">action_type</span><span class="p">,</span> <span class="n">character</span>
+
+
+<div class="viewcode-block" id="Skill">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.skill.Skill">[ドキュメント]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Skill</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ゲーム内のすべてのスキルを定義するEnum。</span>
+
+<span class="sd">    各メンバーは以下の情報を持つタプルとして定義されます:</span>
+<span class="sd">    - id (int): スキルの一意なID。</span>
+<span class="sd">    - name_ja (str): スキル名（日本語）。</span>
+<span class="sd">    - trigger_type (list[TriggerType]): スキルが発動する条件のリスト。</span>
+<span class="sd">    - func (function): スキルの効果を実装した関数。</span>
+
+<span class="sd">    各スキルロジック関数は、`action_data.ActionData`オブジェクトを引数に取り、</span>
+<span class="sd">    戦闘状態の変更や追加効果の発生などを行います。</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+<div class="viewcode-block" id="Skill.func_shaman_1">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.skill.Skill.func_shaman_1">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">func_shaman_1</span><span class="p">(</span><span class="n">ad</span><span class="p">:</span> <span class="s2">&quot;action_data.ActionData&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        【シャーマン１：自己再生】のスキルロジック。</span>
+<span class="sd">        トリガー：回復行動時 (HEAL)</span>
+
+<span class="sd">        術者のHPを、術者の最大HPの20%分回復させます。</span>
+<span class="sd">        このスキルによる回復では、さらなるスキルはトリガーされません。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ad (ActionData): 元となった行動のデータ。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># スキル発動による新たな行動データを作成</span>
+        <span class="n">ad_skill</span> <span class="o">=</span> <span class="n">action_data</span><span class="o">.</span><span class="n">ActionData</span><span class="p">(</span><span class="n">battle</span><span class="o">=</span><span class="n">ad</span><span class="o">.</span><span class="n">battle</span><span class="p">,</span> <span class="n">actor</span><span class="o">=</span><span class="n">ad</span><span class="o">.</span><span class="n">actor</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">ad</span><span class="o">.</span><span class="n">actor</span><span class="p">,</span> <span class="n">action_type</span><span class="o">=</span><span class="n">action_type</span><span class="o">.</span><span class="n">ActionType</span><span class="o">.</span><span class="n">HEAL</span><span class="p">,</span> <span class="n">list_skill</span><span class="o">=</span><span class="p">[])</span>
+
+        <span class="c1"># 回復処理を実行</span>
+        <span class="n">ad_skill</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">heal</span><span class="p">(</span><span class="n">ad_skill</span><span class="p">,</span> <span class="n">status</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">HP</span><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">should_trigger_skill</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># 元の行動データに、このスキルが発動したことを記録</span>
+        <span class="n">ad</span><span class="o">.</span><span class="n">list_skill</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">skill_data</span><span class="o">.</span><span class="n">SkillData</span><span class="p">(</span><span class="n">Skill</span><span class="o">.</span><span class="n">SHAMAN_1</span><span class="p">,</span> <span class="n">ad_skill</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="Skill.func_shaman_2">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.skill.Skill.func_shaman_2">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">func_shaman_2</span><span class="p">(</span><span class="n">ad</span><span class="p">:</span> <span class="s2">&quot;action_data.ActionData&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        【シャーマン２】のスキルロジック。</span>
+<span class="sd">        トリガー：回復行動時 (HEAL)</span>
+
+<span class="sd">        回復対象の攻撃力を、術者のバフ効果率に応じて上昇させます。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ad (ActionData): 元となった行動のデータ。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ad_skill</span> <span class="o">=</span> <span class="n">action_data</span><span class="o">.</span><span class="n">ActionData</span><span class="p">(</span><span class="n">battle</span><span class="o">=</span><span class="n">ad</span><span class="o">.</span><span class="n">battle</span><span class="p">,</span> <span class="n">actor</span><span class="o">=</span><span class="n">ad</span><span class="o">.</span><span class="n">actor</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">ad</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">action_type</span><span class="o">=</span><span class="n">action_type</span><span class="o">.</span><span class="n">ActionType</span><span class="o">.</span><span class="n">BUFF</span><span class="p">,</span> <span class="n">list_skill</span><span class="o">=</span><span class="p">[])</span>
+
+        <span class="c1"># 攻撃力上昇のEffectオブジェクトを作成</span>
+        <span class="n">efct</span> <span class="o">=</span> <span class="n">effect</span><span class="o">.</span><span class="n">Effect</span><span class="p">(</span><span class="n">status</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">ATK</span><span class="p">,</span> <span class="n">effect_type</span><span class="o">.</span><span class="n">EffectType</span><span class="o">.</span><span class="n">RATE</span><span class="p">,</span> <span class="n">ad</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">buff_rate</span><span class="p">)</span>
+
+        <span class="c1"># 対象にEffectを付与</span>
+        <span class="n">ad_skill</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">add_effect</span><span class="p">(</span><span class="n">efct</span><span class="p">)</span>
+
+        <span class="n">ad_skill</span><span class="o">.</span><span class="n">effect</span> <span class="o">=</span> <span class="n">efct</span>
+        <span class="n">ad</span><span class="o">.</span><span class="n">list_skill</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">skill_data</span><span class="o">.</span><span class="n">SkillData</span><span class="p">(</span><span class="n">Skill</span><span class="o">.</span><span class="n">SHAMAN_2</span><span class="p">,</span> <span class="n">ad_skill</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="Skill.func_fighter_1">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.skill.Skill.func_fighter_1">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">func_fighter_1</span><span class="p">(</span><span class="n">ad</span><span class="p">:</span> <span class="s2">&quot;action_data.ActionData&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        【ファイター１】のスキルロジック。</span>
+<span class="sd">        トリガー：クリティカル攻撃時 (CRIT)</span>
+
+<span class="sd">        攻撃対象の防御力を、術者のデバフ効果率に応じて2ターンの間減少させます。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ad (ActionData): 元となった行動のデータ。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ad_skill</span> <span class="o">=</span> <span class="n">action_data</span><span class="o">.</span><span class="n">ActionData</span><span class="p">(</span><span class="n">battle</span><span class="o">=</span><span class="n">ad</span><span class="o">.</span><span class="n">battle</span><span class="p">,</span> <span class="n">actor</span><span class="o">=</span><span class="n">ad</span><span class="o">.</span><span class="n">actor</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">ad</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">action_type</span><span class="o">=</span><span class="n">action_type</span><span class="o">.</span><span class="n">ActionType</span><span class="o">.</span><span class="n">DEBUFF</span><span class="p">,</span> <span class="n">list_skill</span><span class="o">=</span><span class="p">[])</span>
+
+        <span class="c1"># 防御力減少のEffectオブジェクトを作成</span>
+        <span class="n">efct</span> <span class="o">=</span> <span class="n">effect</span><span class="o">.</span><span class="n">Effect</span><span class="p">(</span><span class="n">status</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">DEF</span><span class="p">,</span> <span class="n">effect_type</span><span class="o">.</span><span class="n">EffectType</span><span class="o">.</span><span class="n">RATE</span><span class="p">,</span> <span class="o">-</span><span class="n">ad</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">debuff_rate</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="n">ad_skill</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">add_effect</span><span class="p">(</span><span class="n">efct</span><span class="p">)</span>
+        <span class="n">ad_skill</span><span class="o">.</span><span class="n">effect</span> <span class="o">=</span> <span class="n">efct</span>
+        <span class="n">ad</span><span class="o">.</span><span class="n">list_skill</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">skill_data</span><span class="o">.</span><span class="n">SkillData</span><span class="p">(</span><span class="n">Skill</span><span class="o">.</span><span class="n">FIGHTER_1</span><span class="p">,</span> <span class="n">ad_skill</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="Skill.func_fighter_2">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.skill.Skill.func_fighter_2">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">func_fighter_2</span><span class="p">(</span><span class="n">ad</span><span class="p">:</span> <span class="s2">&quot;action_data.ActionData&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        【ファイター２】のスキルロジック。</span>
+<span class="sd">        トリガー：攻撃時 (ATTACK)</span>
+
+<span class="sd">        主対象以外の敵単体に、攻撃力の20%の追撃を行います。</span>
+<span class="sd">        この追撃ではスキルはトリガーされません。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ad (ActionData): 元となった行動のデータ。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># 主対象以外の敵キャラクターをリストアップ</span>
+        <span class="n">targets</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ad</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">party</span><span class="o">.</span><span class="n">characters</span> <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">uuid</span> <span class="o">!=</span> <span class="n">ad</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">uuid</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">targets</span><span class="p">:</span> <span class="k">return</span> <span class="c1"># 他にターゲットがいない場合は終了</span>
+
+        <span class="n">target</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">targets</span><span class="p">)</span>
+
+        <span class="n">ad_skill</span> <span class="o">=</span> <span class="n">action_data</span><span class="o">.</span><span class="n">ActionData</span><span class="p">(</span><span class="n">battle</span><span class="o">=</span><span class="n">ad</span><span class="o">.</span><span class="n">battle</span><span class="p">,</span> <span class="n">actor</span><span class="o">=</span><span class="n">ad</span><span class="o">.</span><span class="n">actor</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">,</span> <span class="n">action_type</span><span class="o">=</span><span class="n">action_type</span><span class="o">.</span><span class="n">ActionType</span><span class="o">.</span><span class="n">ATTACK</span><span class="p">,</span> <span class="n">list_skill</span><span class="o">=</span><span class="p">[])</span>
+
+        <span class="c1"># 追撃処理を実行</span>
+        <span class="n">ad</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">attack</span><span class="p">(</span><span class="n">ad_skill</span><span class="p">,</span> <span class="n">status</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">ATK</span><span class="p">,</span> <span class="n">rate</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">should_trigger_skill</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="n">ad</span><span class="o">.</span><span class="n">list_skill</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">skill_data</span><span class="o">.</span><span class="n">SkillData</span><span class="p">(</span><span class="n">Skill</span><span class="o">.</span><span class="n">FIGHTER_2</span><span class="p">,</span> <span class="n">ad_skill</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="Skill.func_guardian_1">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.skill.Skill.func_guardian_1">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">func_guardian_1</span><span class="p">(</span><span class="n">ad</span><span class="p">:</span> <span class="s2">&quot;action_data.ActionData&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        【ガーディアン１】のスキルロジック。</span>
+<span class="sd">        トリガー：攻撃時 (ATTACK)</span>
+
+<span class="sd">        味方の中で最もHPが低いキャラクターの防御力を、術者の防御力とバフ効果率に応じて2ターンの間上昇させます。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ad (ActionData): 元となった行動のデータ。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># 最もHPが低い味方をターゲットに設定</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">ad</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">party</span><span class="o">.</span><span class="n">characters</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">attrgetter</span><span class="p">(</span><span class="s2">&quot;hp&quot;</span><span class="p">))</span>
+
+        <span class="n">ad_skill</span> <span class="o">=</span> <span class="n">action_data</span><span class="o">.</span><span class="n">ActionData</span><span class="p">(</span><span class="n">battle</span><span class="o">=</span><span class="n">ad</span><span class="o">.</span><span class="n">battle</span><span class="p">,</span> <span class="n">actor</span><span class="o">=</span><span class="n">ad</span><span class="o">.</span><span class="n">actor</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">,</span> <span class="n">action_type</span><span class="o">=</span><span class="n">action_type</span><span class="o">.</span><span class="n">ActionType</span><span class="o">.</span><span class="n">BUFF</span><span class="p">,</span> <span class="n">list_skill</span><span class="o">=</span><span class="p">[])</span>
+
+        <span class="c1"># 防御力上昇のEffectオブジェクトを作成（加算効果）</span>
+        <span class="n">efct</span> <span class="o">=</span> <span class="n">effect</span><span class="o">.</span><span class="n">Effect</span><span class="p">(</span><span class="n">status</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">DEF</span><span class="p">,</span> <span class="n">effect_type</span><span class="o">.</span><span class="n">EffectType</span><span class="o">.</span><span class="n">ADD</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">ad</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">get_effective_status</span><span class="p">(</span><span class="n">status</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">DEF</span><span class="p">)</span> <span class="o">*</span> <span class="n">ad</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">buff_rate</span><span class="p">),</span> <span class="n">duration</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="n">ad_skill</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">add_effect</span><span class="p">(</span><span class="n">efct</span><span class="p">)</span>
+        <span class="n">ad_skill</span><span class="o">.</span><span class="n">effect</span> <span class="o">=</span> <span class="n">efct</span>
+        <span class="n">ad</span><span class="o">.</span><span class="n">list_skill</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">skill_data</span><span class="o">.</span><span class="n">SkillData</span><span class="p">(</span><span class="n">Skill</span><span class="o">.</span><span class="n">GUARDIAN_1</span><span class="p">,</span> <span class="n">ad_skill</span><span class="p">))</span></div>
+
+        
+
+<div class="viewcode-block" id="Skill.func_guardian_2">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.skill.Skill.func_guardian_2">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">func_guardian_2</span><span class="p">(</span><span class="n">ad</span><span class="p">:</span> <span class="s2">&quot;action_data.ActionData&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        【ガーディアン２】のスキルロジック。</span>
+<span class="sd">        トリガー：クリティカル攻撃時 (CRIT)</span>
+
+<span class="sd">        術者以外の味方2体に、防御力上昇バフを2ターンの間付与します。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ad (ActionData): 元となった行動のデータ。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># 術者以外の味方をリストアップ</span>
+        <span class="n">targets</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ad</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">party</span><span class="o">.</span><span class="n">characters</span> <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">uuid</span> <span class="o">!=</span> <span class="n">ad</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">uuid</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">targets</span><span class="p">:</span> <span class="k">return</span>
+
+        <span class="c1"># ランダムに2体選ぶ（2体未満の場合は全員）</span>
+        <span class="n">targets</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">targets</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">targets</span><span class="p">),</span> <span class="mi">2</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">targets</span><span class="p">:</span>
+            <span class="n">efct</span> <span class="o">=</span> <span class="n">effect</span><span class="o">.</span><span class="n">Effect</span><span class="p">(</span><span class="n">status</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">DEF</span><span class="p">,</span> <span class="n">effect_type</span><span class="o">.</span><span class="n">EffectType</span><span class="o">.</span><span class="n">ADD</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">ad</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">get_effective_status</span><span class="p">(</span><span class="n">status</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">DEF</span><span class="p">)</span> <span class="o">*</span> <span class="n">ad</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">buff_rate</span><span class="p">),</span> <span class="n">duration</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">target</span><span class="o">.</span><span class="n">add_effect</span><span class="p">(</span><span class="n">efct</span><span class="p">)</span>
+            <span class="n">ad_skill</span> <span class="o">=</span> <span class="n">action_data</span><span class="o">.</span><span class="n">ActionData</span><span class="p">(</span><span class="n">battle</span><span class="o">=</span><span class="n">ad</span><span class="o">.</span><span class="n">battle</span><span class="p">,</span> <span class="n">actor</span><span class="o">=</span><span class="n">ad</span><span class="o">.</span><span class="n">actor</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">,</span> <span class="n">action_type</span><span class="o">=</span><span class="n">action_type</span><span class="o">.</span><span class="n">ActionType</span><span class="o">.</span><span class="n">BUFF</span><span class="p">,</span> <span class="n">effect</span><span class="o">=</span><span class="n">efct</span><span class="p">,</span> <span class="n">list_skill</span><span class="o">=</span><span class="p">[])</span>
+            <span class="n">ad</span><span class="o">.</span><span class="n">list_skill</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">skill_data</span><span class="o">.</span><span class="n">SkillData</span><span class="p">(</span><span class="n">Skill</span><span class="o">.</span><span class="n">GUARDIAN_2</span><span class="p">,</span> <span class="n">ad_skill</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="Skill.func_cleric_1">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.skill.Skill.func_cleric_1">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">func_cleric_1</span><span class="p">(</span><span class="n">ad</span><span class="p">:</span> <span class="s2">&quot;action_data.ActionData&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        【クレリック１】のスキルロジック。</span>
+<span class="sd">        トリガー：クリティカル攻撃時 (CRIT)</span>
+
+<span class="sd">        味方の中で最もHPが低いキャラクターを、術者の攻撃力に依存して回復します。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ad (ActionData): 元となった行動のデータ。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">ad</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">party</span><span class="o">.</span><span class="n">characters</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">attrgetter</span><span class="p">(</span><span class="s2">&quot;hp&quot;</span><span class="p">))</span>
+
+        <span class="n">ad_skill</span> <span class="o">=</span> <span class="n">action_data</span><span class="o">.</span><span class="n">ActionData</span><span class="p">(</span><span class="n">battle</span><span class="o">=</span><span class="n">ad</span><span class="o">.</span><span class="n">battle</span><span class="p">,</span> <span class="n">actor</span><span class="o">=</span><span class="n">ad</span><span class="o">.</span><span class="n">actor</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">,</span> <span class="n">action_type</span><span class="o">=</span><span class="n">action_type</span><span class="o">.</span><span class="n">ActionType</span><span class="o">.</span><span class="n">HEAL</span><span class="p">,</span> <span class="n">list_skill</span><span class="o">=</span><span class="p">[])</span>
+
+        <span class="c1"># 攻撃力を参照して回復</span>
+        <span class="n">ad_skill</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">heal</span><span class="p">(</span><span class="n">ad_skill</span><span class="p">,</span> <span class="n">status</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">ATK</span><span class="p">,</span> <span class="n">should_trigger_skill</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="n">ad</span><span class="o">.</span><span class="n">list_skill</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">skill_data</span><span class="o">.</span><span class="n">SkillData</span><span class="p">(</span><span class="n">Skill</span><span class="o">.</span><span class="n">CLERIC_1</span><span class="p">,</span> <span class="n">ad_skill</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="Skill.func_cleric_2">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.skill.Skill.func_cleric_2">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">func_cleric_2</span><span class="p">(</span><span class="n">ad</span><span class="p">:</span> <span class="s2">&quot;action_data.ActionData&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        【クレリック２】のスキルロジック。</span>
+<span class="sd">        トリガー：クリティカル攻撃時 (CRIT)</span>
+
+<span class="sd">        次に行動する味方の攻撃力を、術者のバフ効果率に応じて上昇させます。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ad (ActionData): 元となった行動のデータ。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># 戦闘の行動順リストから、次の味方を特定</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ad</span><span class="o">.</span><span class="n">battle</span><span class="o">.</span><span class="n">order</span> <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">party</span><span class="o">.</span><span class="n">uuid</span> <span class="o">==</span> <span class="n">ad</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">party</span><span class="o">.</span><span class="n">uuid</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">ad_skill</span> <span class="o">=</span> <span class="n">action_data</span><span class="o">.</span><span class="n">ActionData</span><span class="p">(</span><span class="n">battle</span><span class="o">=</span><span class="n">ad</span><span class="o">.</span><span class="n">battle</span><span class="p">,</span> <span class="n">actor</span><span class="o">=</span><span class="n">ad</span><span class="o">.</span><span class="n">actor</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">target</span><span class="p">,</span> <span class="n">action_type</span><span class="o">=</span><span class="n">action_type</span><span class="o">.</span><span class="n">ActionType</span><span class="o">.</span><span class="n">BUFF</span><span class="p">,</span> <span class="n">list_skill</span><span class="o">=</span><span class="p">[])</span>
+
+        <span class="n">efct</span> <span class="o">=</span> <span class="n">effect</span><span class="o">.</span><span class="n">Effect</span><span class="p">(</span><span class="n">status</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">ATK</span><span class="p">,</span> <span class="n">effect_type</span><span class="o">.</span><span class="n">EffectType</span><span class="o">.</span><span class="n">RATE</span><span class="p">,</span> <span class="n">ad</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">buff_rate</span><span class="p">)</span>
+        <span class="n">ad_skill</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">add_effect</span><span class="p">(</span><span class="n">efct</span><span class="p">)</span>
+        <span class="n">ad_skill</span><span class="o">.</span><span class="n">effect</span> <span class="o">=</span> <span class="n">efct</span>
+        <span class="n">ad</span><span class="o">.</span><span class="n">list_skill</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">skill_data</span><span class="o">.</span><span class="n">SkillData</span><span class="p">(</span><span class="n">Skill</span><span class="o">.</span><span class="n">CLERIC_2</span><span class="p">,</span> <span class="n">ad_skill</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="Skill.func_berserker_1">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.skill.Skill.func_berserker_1">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">func_berserker_1</span><span class="p">(</span><span class="n">ad</span><span class="p">:</span> <span class="s2">&quot;action_data.ActionData&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        【バーサーカー１】のスキルロジック。</span>
+<span class="sd">        トリガー：クリティカル攻撃時 (CRIT)</span>
+
+<span class="sd">        攻撃対象の速度を、術者のデバフ効果率に応じて2ターンの間減少させます。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ad (ActionData): 元となった行動のデータ。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ad_skill</span> <span class="o">=</span> <span class="n">action_data</span><span class="o">.</span><span class="n">ActionData</span><span class="p">(</span><span class="n">battle</span><span class="o">=</span><span class="n">ad</span><span class="o">.</span><span class="n">battle</span><span class="p">,</span> <span class="n">actor</span><span class="o">=</span><span class="n">ad</span><span class="o">.</span><span class="n">actor</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">ad</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">action_type</span><span class="o">=</span><span class="n">action_type</span><span class="o">.</span><span class="n">ActionType</span><span class="o">.</span><span class="n">DEBUFF</span><span class="p">,</span> <span class="n">list_skill</span><span class="o">=</span><span class="p">[])</span>
+
+        <span class="n">efct</span> <span class="o">=</span> <span class="n">effect</span><span class="o">.</span><span class="n">Effect</span><span class="p">(</span><span class="n">status</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">SPD</span><span class="p">,</span> <span class="o">-</span><span class="n">effect_type</span><span class="o">.</span><span class="n">EffectType</span><span class="o">.</span><span class="n">RATE</span><span class="p">,</span> <span class="n">ad</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">debuff_rate</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">ad_skill</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">add_effect</span><span class="p">(</span><span class="n">efct</span><span class="p">)</span>
+        <span class="n">ad</span><span class="o">.</span><span class="n">battle</span><span class="o">.</span><span class="n">calc_order</span><span class="p">()</span> <span class="c1"># 速度が変化したので行動順を再計算</span>
+
+        <span class="n">ad_skill</span><span class="o">.</span><span class="n">effect</span> <span class="o">=</span> <span class="n">efct</span>
+        <span class="n">ad</span><span class="o">.</span><span class="n">list_skill</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">skill_data</span><span class="o">.</span><span class="n">SkillData</span><span class="p">(</span><span class="n">Skill</span><span class="o">.</span><span class="n">BERSERKER_1</span><span class="p">,</span> <span class="n">ad_skill</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="Skill.func_berserker_2">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.skill.Skill.func_berserker_2">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">func_berserker_2</span><span class="p">(</span><span class="n">ad</span><span class="p">:</span> <span class="s2">&quot;action_data.ActionData&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        【バーサーカー２】のスキルロジック。</span>
+<span class="sd">        トリガー：被ダメージ時 (DAMAGED), 回復時 (HEALED)</span>
+
+<span class="sd">        自身のHPが30%以下の場合、攻撃力を30%上昇させる永続バフを付与します。</span>
+<span class="sd">        HPが30%を超えると、このバフは解除されます。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ad (ActionData): 元となった行動のデータ。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">ad</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">hp</span> <span class="o">/</span> <span class="n">ad</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">get_effective_status</span><span class="p">(</span><span class="n">status</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">HP</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mf">0.3</span><span class="p">:</span>
+            <span class="n">ad_skill</span> <span class="o">=</span> <span class="n">action_data</span><span class="o">.</span><span class="n">ActionData</span><span class="p">(</span><span class="n">battle</span><span class="o">=</span><span class="n">ad</span><span class="o">.</span><span class="n">battle</span><span class="p">,</span> <span class="n">actor</span><span class="o">=</span><span class="n">ad</span><span class="o">.</span><span class="n">actor</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">ad</span><span class="o">.</span><span class="n">actor</span><span class="p">,</span> <span class="n">action_type</span><span class="o">=</span><span class="n">action_type</span><span class="o">.</span><span class="n">ActionType</span><span class="o">.</span><span class="n">BUFF</span><span class="p">,</span> <span class="n">list_skill</span><span class="o">=</span><span class="p">[])</span>
+
+            <span class="c1"># 解除用のタグを付けた永続バフ(-1)を付与</span>
+            <span class="n">efct</span> <span class="o">=</span> <span class="n">effect</span><span class="o">.</span><span class="n">Effect</span><span class="p">(</span><span class="n">status</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">HP</span><span class="p">,</span> <span class="n">effect_type</span><span class="o">.</span><span class="n">EffectType</span><span class="o">.</span><span class="n">RATE</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="n">duration</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="s2">&quot;Skill_Berserker_2&quot;</span><span class="p">)</span>
+            <span class="n">ad_skill</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">add_effect</span><span class="p">(</span><span class="n">efct</span><span class="p">)</span>
+            <span class="n">ad_skill</span><span class="o">.</span><span class="n">effect</span> <span class="o">=</span> <span class="n">efct</span>
+            <span class="n">ad</span><span class="o">.</span><span class="n">list_skill</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">skill_data</span><span class="o">.</span><span class="n">SkillData</span><span class="p">(</span><span class="n">Skill</span><span class="o">.</span><span class="n">BERSERKER_2</span><span class="p">,</span> <span class="n">ad_skill</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># 条件を満たさなくなったらタグで指定してバフを解除</span>
+            <span class="n">ad</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">remove_effect</span><span class="p">(</span><span class="s2">&quot;Skill_Berserker_2&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="Skill.func_assassin_1">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.skill.Skill.func_assassin_1">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">func_assassin_1</span><span class="p">(</span><span class="n">ad</span><span class="p">:</span> <span class="s2">&quot;action_data.ActionData&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        【アサシン１】のスキルロジック。</span>
+<span class="sd">        トリガー：敵を倒した時 (DEFEAT)</span>
+
+<span class="sd">        自身の行動ゲージをリセットし、即座に再行動します。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ad (ActionData): 元となった行動のデータ。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ad_skill</span> <span class="o">=</span> <span class="n">action_data</span><span class="o">.</span><span class="n">ActionData</span><span class="p">(</span><span class="n">battle</span><span class="o">=</span><span class="n">ad</span><span class="o">.</span><span class="n">battle</span><span class="p">,</span> <span class="n">actor</span><span class="o">=</span><span class="n">ad</span><span class="o">.</span><span class="n">actor</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">ad</span><span class="o">.</span><span class="n">actor</span><span class="p">,</span> <span class="n">action_type</span><span class="o">=</span><span class="n">action_type</span><span class="o">.</span><span class="n">ActionType</span><span class="o">.</span><span class="n">OTHER</span><span class="p">,</span> <span class="n">list_skill</span><span class="o">=</span><span class="p">[])</span>
+        
+        <span class="c1"># 自身の行動カウントを直前の行動分だけ巻き戻す</span>
+        <span class="n">ad_skill</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">count</span> <span class="o">-=</span> <span class="n">ad_skill</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">last_count</span>
+
+        <span class="n">ad</span><span class="o">.</span><span class="n">list_skill</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">skill_data</span><span class="o">.</span><span class="n">SkillData</span><span class="p">(</span><span class="n">Skill</span><span class="o">.</span><span class="n">ASSASSIN_1</span><span class="p">,</span> <span class="n">ad_skill</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="Skill.func_assassin_2">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.skill.Skill.func_assassin_2">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">func_assassin_2</span><span class="p">(</span><span class="n">ad</span><span class="p">:</span> <span class="s2">&quot;action_data.ActionData&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        【アサシン２】のスキルロジック。</span>
+<span class="sd">        トリガー：クリティカル攻撃時 (CRIT)</span>
+
+<span class="sd">        攻撃対象の攻撃力を、術者のデバフ効果率に応じて2ターンの間減少させます。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ad (ActionData): 元となった行動のデータ。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ad_skill</span> <span class="o">=</span> <span class="n">action_data</span><span class="o">.</span><span class="n">ActionData</span><span class="p">(</span><span class="n">battle</span><span class="o">=</span><span class="n">ad</span><span class="o">.</span><span class="n">battle</span><span class="p">,</span> <span class="n">actor</span><span class="o">=</span><span class="n">ad</span><span class="o">.</span><span class="n">actor</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">ad</span><span class="o">.</span><span class="n">target</span><span class="p">,</span> <span class="n">action_type</span><span class="o">=</span><span class="n">action_type</span><span class="o">.</span><span class="n">ActionType</span><span class="o">.</span><span class="n">DEBUFF</span><span class="p">,</span> <span class="n">list_skill</span><span class="o">=</span><span class="p">[])</span>
+
+        <span class="n">efct</span> <span class="o">=</span> <span class="n">effect</span><span class="o">.</span><span class="n">Effect</span><span class="p">(</span><span class="n">status</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">ATK</span><span class="p">,</span> <span class="n">effect_type</span><span class="o">.</span><span class="n">EffectType</span><span class="o">.</span><span class="n">RATE</span><span class="p">,</span> <span class="o">-</span><span class="n">ad</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">debuff_rate</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">ad_skill</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">add_effect</span><span class="p">(</span><span class="n">efct</span><span class="p">)</span>
+        <span class="n">ad_skill</span><span class="o">.</span><span class="n">effect</span> <span class="o">=</span> <span class="n">efct</span>
+        <span class="n">ad</span><span class="o">.</span><span class="n">list_skill</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">skill_data</span><span class="o">.</span><span class="n">SkillData</span><span class="p">(</span><span class="n">Skill</span><span class="o">.</span><span class="n">ASSASSIN_2</span><span class="p">,</span> <span class="n">ad_skill</span><span class="p">))</span></div>
+
+
+
+    <span class="c1"># --- Enumメンバーの定義 ---</span>
+    <span class="c1"># (ID, 日本語名, [トリガー], ロジック関数)</span>
+    <span class="n">SHAMAN_1</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;自己再生&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">trigger_type</span><span class="o">.</span><span class="n">TriggerType</span><span class="o">.</span><span class="n">HEAL</span><span class="p">],</span> <span class="n">func_shaman_1</span><span class="p">)</span>
+    <span class="n">SHAMAN_2</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;シャーマン２&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">trigger_type</span><span class="o">.</span><span class="n">TriggerType</span><span class="o">.</span><span class="n">HEAL</span><span class="p">],</span> <span class="n">func_shaman_2</span><span class="p">)</span>
+    <span class="n">FIGHTER_1</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;ファイター１&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">trigger_type</span><span class="o">.</span><span class="n">TriggerType</span><span class="o">.</span><span class="n">CRIT</span><span class="p">],</span> <span class="n">func_fighter_1</span><span class="p">)</span>
+    <span class="n">FIGHTER_2</span> <span class="o">=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;ファイター２&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">trigger_type</span><span class="o">.</span><span class="n">TriggerType</span><span class="o">.</span><span class="n">ATTACK</span><span class="p">],</span> <span class="n">func_fighter_2</span><span class="p">)</span>
+    <span class="n">GUARDIAN_1</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;ガーディアン１&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">trigger_type</span><span class="o">.</span><span class="n">TriggerType</span><span class="o">.</span><span class="n">ATTACK</span><span class="p">],</span> <span class="n">func_guardian_1</span><span class="p">)</span>
+    <span class="n">GUARDIAN_2</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;ガーディアン２&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">trigger_type</span><span class="o">.</span><span class="n">TriggerType</span><span class="o">.</span><span class="n">CRIT</span><span class="p">],</span> <span class="n">func_guardian_2</span><span class="p">)</span>
+    <span class="n">CLERIC_1</span> <span class="o">=</span> <span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="s2">&quot;クレリック１&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">trigger_type</span><span class="o">.</span><span class="n">TriggerType</span><span class="o">.</span><span class="n">CRIT</span><span class="p">],</span> <span class="n">func_cleric_1</span><span class="p">)</span>
+    <span class="n">CLERIC_2</span> <span class="o">=</span> <span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="s2">&quot;クレリック２&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">trigger_type</span><span class="o">.</span><span class="n">TriggerType</span><span class="o">.</span><span class="n">CRIT</span><span class="p">],</span> <span class="n">func_cleric_2</span><span class="p">)</span>
+    <span class="n">BERSERKER_1</span> <span class="o">=</span> <span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="s2">&quot;バーサーカー１&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">trigger_type</span><span class="o">.</span><span class="n">TriggerType</span><span class="o">.</span><span class="n">CRIT</span><span class="p">],</span> <span class="n">func_berserker_1</span><span class="p">)</span>
+    <span class="n">BERSERKER_2</span> <span class="o">=</span> <span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="s2">&quot;バーサーカー２&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">trigger_type</span><span class="o">.</span><span class="n">TriggerType</span><span class="o">.</span><span class="n">DAMAGED</span><span class="p">,</span> <span class="n">trigger_type</span><span class="o">.</span><span class="n">TriggerType</span><span class="o">.</span><span class="n">HEALED</span><span class="p">],</span> <span class="n">func_berserker_2</span><span class="p">)</span>
+    <span class="n">ASSASSIN_1</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;アサシン１&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">trigger_type</span><span class="o">.</span><span class="n">TriggerType</span><span class="o">.</span><span class="n">DEFEAT</span><span class="p">],</span> <span class="n">func_assassin_1</span><span class="p">)</span>
+    <span class="n">ASSASSIN_2</span> <span class="o">=</span> <span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="s2">&quot;アサシン２&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">trigger_type</span><span class="o">.</span><span class="n">TriggerType</span><span class="o">.</span><span class="n">CRIT</span><span class="p">],</span> <span class="n">func_assassin_2</span><span class="p">)</span>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">name_ja</span><span class="p">,</span> <span class="n">trigger_type</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Enumメンバーを初期化します。&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name_ja</span> <span class="o">=</span> <span class="n">name_ja</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trigger_type</span> <span class="o">=</span> <span class="n">trigger_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fnc</span> <span class="o">=</span> <span class="n">func</span>
+
+
+<div class="viewcode-block" id="Skill.func">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.skill.Skill.func">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ad</span><span class="p">:</span> <span class="s2">&quot;action_data.ActionData&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        このスキルに紐付けられたロジック関数を実行します。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ad (ActionData): スキル処理に渡される行動データ。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fnc</span><span class="p">(</span><span class="n">ad</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="Skill.get_by_id">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.skill.Skill.get_by_id">[ドキュメント]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_by_id</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        指定されたIDを持つSkillメンバーを返します。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            id (int): 検索するスキルのID。</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Skill: 見つかったSkill Enumメンバー。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">cls</span> <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="nb">id</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span></div>
+</div>
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, qr0.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

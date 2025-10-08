@@ -1,0 +1,265 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="ja" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.cog.other &mdash; myla_game 1.6 ドキュメント</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=044f9cdb"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/translations.js?v=4755f45a"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../../genindex.html" />
+    <link rel="search" title="検索" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            myla_game
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../src.html">src package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">myla_game</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">モジュールコード</a></li>
+      <li class="breadcrumb-item active">src.cog.other</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>src.cog.other のソースコード</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">デイリー報酬、所持金確認、ゲーム開始時の初期キャラクター配布など、</span>
+<span class="sd">他のカテゴリに分類されない補助的なコマンドを提供するCog。</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">discord</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">discord</span><span class="w"> </span><span class="kn">import</span> <span class="n">app_commands</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">discord.ext</span><span class="w"> </span><span class="kn">import</span> <span class="n">commands</span><span class="p">,</span> <span class="n">tasks</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">utils</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..myla_game</span><span class="w"> </span><span class="kn">import</span> <span class="n">myla_game</span> <span class="k">as</span> <span class="n">game</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">typing</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">aiofiles</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+
+
+<div class="viewcode-block" id="OtherCmd">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.other.OtherCmd">[ドキュメント]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OtherCmd</span><span class="p">(</span><span class="n">commands</span><span class="o">.</span><span class="n">Cog</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;補助的なコマンドとタスクをまとめたCogクラス。&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bot</span><span class="p">:</span> <span class="n">commands</span><span class="o">.</span><span class="n">Bot</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Cogを初期化し、バックグラウンドタスクを開始します。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            bot (commands.Bot): Botのインスタンス。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bot</span> <span class="o">=</span> <span class="n">bot</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reset_gold_hour_count</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loop_reset_gold_hour_count</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+    
+    <span class="nd">@app_commands</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;daily&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;デイリー報酬を獲得する&quot;</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">daily</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">int</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">Interaction</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;デイリーログインボーナス（ゴールド）を受け取ります。1日1回まで。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            int (discord.Interaction): インタラクションオブジェクト。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">game</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">daily_login</span><span class="p">(</span><span class="nb">int</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">):</span>
+            <span class="k">await</span> <span class="nb">int</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;**60G** 獲得しました&#39;</span><span class="p">,</span> <span class="n">ephemeral</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">await</span> <span class="nb">int</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;すでに獲得済みです&#39;</span><span class="p">,</span> <span class="n">ephemeral</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+    <span class="nd">@app_commands</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;gold&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;ゴールドの所持数を確認する&quot;</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">gold</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">int</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">Interaction</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;現在のゴールド所持数を表示します。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            int (discord.Interaction): インタラクションオブジェクト。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="n">game</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">get_player_gold_count</span><span class="p">(</span><span class="nb">int</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="k">await</span> <span class="nb">int</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;**</span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s1"> G**&#39;</span><span class="p">,</span> <span class="n">ephemeral</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="OtherCmd.ViewItem">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.other.OtherCmd.ViewItem">[ドキュメント]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">ViewItem</span><span class="p">(</span><span class="n">discord</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">View</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;アイテムを選択するためのView。&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="OtherCmd.ViewItem.Select">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.other.OtherCmd.ViewItem.Select">[ドキュメント]</a>
+        <span class="k">class</span><span class="w"> </span><span class="nc">Select</span><span class="p">(</span><span class="n">discord</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">Select</span><span class="p">):</span>
+<div class="viewcode-block" id="OtherCmd.ViewItem.Select.callback">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.other.OtherCmd.ViewItem.Select.callback">[ドキュメント]</a>
+            <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">int</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">Interaction</span><span class="p">):</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">get_item_count</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span></div>
+</div>
+
+
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mi">180</span><span class="p">):</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obj</span> <span class="o">=</span> <span class="n">obj</span>
+            <span class="n">select</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Select</span><span class="p">()</span>
+            <span class="c1"># item.jsonから全アイテムを読み込み選択肢に追加</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">sys</span><span class="o">.</span><span class="n">get_game_path</span><span class="p">(</span><span class="s2">&quot;asset/data/item.json&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">item_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">item_data</span><span class="p">[</span><span class="s2">&quot;list&quot;</span><span class="p">]:</span>
+                <span class="n">select</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="n">i</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">][</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span><span class="n">select</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="OtherCmd.get_item_count">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.other.OtherCmd.get_item_count">[ドキュメント]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_item_count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interaction</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">Interaction</span><span class="p">,</span> <span class="n">select</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">Select</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Viewから呼び出され、選択されたアイテムの所持数を表示する。&quot;&quot;&quot;</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="n">game</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">get_player_item_count</span><span class="p">(</span><span class="n">interaction</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">select</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="k">await</span> <span class="n">interaction</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;**</span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s1"> 個**&#39;</span><span class="p">,</span> <span class="n">ephemeral</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+
+    <span class="nd">@app_commands</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;item&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;アイテムの所持数を確認する&quot;</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">int</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">Interaction</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;アイテムを選択させ、その所持数を表示します。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            int (discord.Interaction): インタラクションオブジェクト。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">view</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ViewItem</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">await</span> <span class="nb">int</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="s2">&quot;アイテムを選択してください&quot;</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="n">view</span><span class="p">,</span> <span class="n">ephemeral</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+    <span class="nd">@app_commands</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;stamina&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;スタミナの残量を確認する&quot;</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stamina</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">int</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">Interaction</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;現在のスタミナ残量を表示します。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            int (discord.Interaction): インタラクションオブジェクト。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">stamina</span> <span class="o">=</span> <span class="n">game</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">get_player_stamina</span><span class="p">(</span><span class="nb">int</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="k">await</span> <span class="nb">int</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;**</span><span class="si">{</span><span class="n">stamina</span><span class="si">}</span><span class="s1">** / 180&#39;</span><span class="p">,</span> <span class="n">ephemeral</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+    <span class="nd">@app_commands</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;ゲームの初期キャラクターを獲得する（１回限り）&quot;</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">int</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">Interaction</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;ゲーム開始時に、初期キャラクター2体を付与します。1アカウントにつき1回のみ実行可能です。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            int (discord.Interaction): インタラクションオブジェクト。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">game</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">has_player_character_by_id</span><span class="p">(</span><span class="nb">int</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="mi">10001</span><span class="p">):</span>
+            <span class="k">await</span> <span class="nb">int</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="s2">&quot;すでに所有しています&quot;</span><span class="p">,</span> <span class="n">ephemeral</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">return</span>
+        
+        <span class="n">game</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">give_player_character</span><span class="p">(</span><span class="nb">int</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="mi">10001</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">game</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">give_player_character</span><span class="p">(</span><span class="nb">int</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="mi">10003</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">await</span> <span class="nb">int</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;初期キャラクターを獲得しました&#39;</span><span class="p">,</span> <span class="n">ephemeral</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="OtherCmd.reset_gold_hour_count">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.other.OtherCmd.reset_gold_hour_count">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset_gold_hour_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;全プレイヤーの「1時間あたりのゴールド獲得量」をリセットします。&quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">sys</span><span class="o">.</span><span class="n">get_game_path</span><span class="p">(</span><span class="s2">&quot;data/gold.json&quot;</span><span class="p">),</span> <span class="s2">&quot;r+&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">gold_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">for</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">gold_data</span><span class="p">:</span>
+                <span class="n">gold_data</span><span class="p">[</span><span class="nb">id</span><span class="p">][</span><span class="s2">&quot;in_hour&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">gold_data</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">truncate</span><span class="p">()</span></div>
+
+
+
+    <span class="nd">@tasks</span><span class="o">.</span><span class="n">loop</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">time</span><span class="p">(</span><span class="n">hour</span><span class="o">=</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">24</span><span class="p">)])</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">loop_reset_gold_hour_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;毎時0分に`reset_gold_hour_count`を実行するバックグラウンドタスク。&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reset_gold_hour_count</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="setup">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.other.setup">[ドキュメント]</a>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="n">bot</span><span class="p">:</span> <span class="n">commands</span><span class="o">.</span><span class="n">Bot</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;CogをBotに登録するためのセットアップ関数。&quot;&quot;&quot;</span>
+    <span class="k">await</span> <span class="n">bot</span><span class="o">.</span><span class="n">add_cog</span><span class="p">(</span><span class="n">OtherCmd</span><span class="p">(</span><span class="n">bot</span><span class="p">))</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, qr0.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

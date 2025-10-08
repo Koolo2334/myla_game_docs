@@ -1,0 +1,149 @@
+src.myla\_game package
+======================
+
+Submodules
+----------
+
+src.myla\_game.action\_data module
+----------------------------------
+
+.. automodule:: src.myla_game.action_data
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+src.myla\_game.action\_type module
+----------------------------------
+
+.. automodule:: src.myla_game.action_type
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+src.myla\_game.battle module
+----------------------------
+
+.. automodule:: src.myla_game.battle
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+src.myla\_game.character module
+-------------------------------
+
+.. automodule:: src.myla_game.character
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+src.myla\_game.effect module
+----------------------------
+
+.. automodule:: src.myla_game.effect
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+src.myla\_game.effect\_type module
+----------------------------------
+
+.. automodule:: src.myla_game.effect_type
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+src.myla\_game.element module
+-----------------------------
+
+.. automodule:: src.myla_game.element
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+src.myla\_game.job module
+-------------------------
+
+.. automodule:: src.myla_game.job
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+src.myla\_game.myla\_game module
+--------------------------------
+
+.. automodule:: src.myla_game.myla_game
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+src.myla\_game.party module
+---------------------------
+
+.. automodule:: src.myla_game.party
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+src.myla\_game.skill module
+---------------------------
+
+.. automodule:: src.myla_game.skill
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+src.myla\_game.skill\_data module
+---------------------------------
+
+.. automodule:: src.myla_game.skill_data
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+src.myla\_game.status module
+----------------------------
+
+.. automodule:: src.myla_game.status
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+src.myla\_game.stone module
+---------------------------
+
+.. automodule:: src.myla_game.stone
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+src.myla\_game.trigger\_type module
+-----------------------------------
+
+.. automodule:: src.myla_game.trigger_type
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+src.myla\_game.utils module
+---------------------------
+
+.. automodule:: src.myla_game.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+src.myla\_game.weapon module
+----------------------------
+
+.. automodule:: src.myla_game.weapon
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: src.myla_game
+   :members:
+   :undoc-members:
+   :show-inheritance:

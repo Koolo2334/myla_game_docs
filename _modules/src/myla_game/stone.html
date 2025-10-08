@@ -1,0 +1,552 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="ja" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.myla_game.stone &mdash; myla_game 1.6 ドキュメント</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=044f9cdb"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/translations.js?v=4755f45a"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../../genindex.html" />
+    <link rel="search" title="検索" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            myla_game
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../src.html">src package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">myla_game</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">モジュールコード</a></li>
+      <li class="breadcrumb-item active">src.myla_game.stone</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>src.myla_game.stone のソースコード</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">ゲーム内の装備品「ストーン」に関するデータ構造とロジックを定義するモジュール。</span>
+
+<span class="sd">ストーンのオプション、部位（タイプ）、セット効果をEnumとして定義し、</span>
+<span class="sd">ストーンの生成、強化（レベルアップ）、経験値計算などの機能を持つ`Stone`クラスを提供します。</span>
+<span class="sd">データは `asset/data/stone.json` から動的に読み込まれます。</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">utils_bot</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">utils</span><span class="p">,</span> <span class="n">status</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">decimal</span><span class="w"> </span><span class="kn">import</span> <span class="n">Decimal</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+
+
+<div class="viewcode-block" id="StoneOption">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.stone.StoneOption">[ドキュメント]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">StoneOption</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ストーンが持ちうるオプション（ステータス効果）の種類を定義するEnum。</span>
+<span class="sd">    </span>
+<span class="sd">    各メンバーは `asset/data/stone.json` 内の &quot;option&quot; リストに対応しています。</span>
+<span class="sd">    Enumの初期化時に、対応するIDのデータを読み込み、プロパティとして保持します。</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">HP_ADD</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">HP_RATE</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">ATK_ADD</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">ATK_RATE</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">DEF_ADD</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">DEF_RATE</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">CRIT_RATE</span> <span class="o">=</span> <span class="mi">6</span>
+    <span class="n">CRIT_DMG</span> <span class="o">=</span> <span class="mi">7</span>
+    <span class="n">SPD</span> <span class="o">=</span> <span class="mi">8</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Enumメンバーを初期化し、JSONから詳細データを読み込みます。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            id (int): `stone.json` 内のオプションID。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">utils_bot</span><span class="o">.</span><span class="n">sys</span><span class="o">.</span><span class="n">get_game_path</span><span class="p">(</span><span class="s2">&quot;asset/data/stone.json&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">stone_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+        <span class="n">stone_option_data</span> <span class="o">=</span> <span class="n">stone_data</span><span class="p">[</span><span class="s2">&quot;option&quot;</span><span class="p">]</span>
+        <span class="n">option_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">stone_option_data</span> <span class="k">if</span> <span class="n">s</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="nb">id</span><span class="p">]</span>
+        <span class="n">option</span> <span class="o">=</span> <span class="n">option_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">option_data</span> <span class="k">else</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">option</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name_ja</span> <span class="o">=</span> <span class="n">option</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sfx</span> <span class="o">=</span> <span class="n">option</span><span class="p">[</span><span class="s2">&quot;sfx&quot;</span><span class="p">]</span>  <span class="c1"># 表示用の接尾辞 (例: &#39;%&#39;)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dp</span> <span class="o">=</span> <span class="n">option</span><span class="p">[</span><span class="s2">&quot;dp&quot;</span><span class="p">]</span>    <span class="c1"># 表示時の小数点以下の桁数</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_base</span> <span class="o">=</span> <span class="n">option</span><span class="p">[</span><span class="s2">&quot;main_base&quot;</span><span class="p">]</span> <span class="c1"># メインオプションの初期値</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_incr</span> <span class="o">=</span> <span class="n">option</span><span class="p">[</span><span class="s2">&quot;main_incr&quot;</span><span class="p">]</span> <span class="c1"># メインオプションの強化ごとの上昇値</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sub_incr</span> <span class="o">=</span> <span class="n">option</span><span class="p">[</span><span class="s2">&quot;sub_incr&quot;</span><span class="p">]</span>   <span class="c1"># サブオプションの強化値の範囲</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">status</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="n">option</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">])</span> <span class="c1"># 対応するステータス</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">effect_type</span> <span class="o">=</span> <span class="n">option</span><span class="p">[</span><span class="s2">&quot;effect_type&quot;</span><span class="p">]</span> <span class="c1"># 効果の種類 (&#39;add&#39; or &#39;mul&#39;)</span>
+
+
+<div class="viewcode-block" id="StoneOption.get_by_id">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.stone.StoneOption.get_by_id">[ドキュメント]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_by_id</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;IDからStoneOptionメンバーを取得します。&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">cls</span> <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="nb">id</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="StoneType">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.stone.StoneType">[ドキュメント]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">StoneType</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ストーンの部位（タイプ）を定義するEnum。</span>
+<span class="sd">    部位によって、出現しうるメインオプションとサブオプションが異なります。</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">JEWEL</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">CRYSTAL</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">ORB</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">BROOCH</span> <span class="o">=</span> <span class="mi">3</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Enumメンバーを初期化し、JSONから詳細データを読み込みます。&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">utils_bot</span><span class="o">.</span><span class="n">sys</span><span class="o">.</span><span class="n">get_game_path</span><span class="p">(</span><span class="s2">&quot;asset/data/stone.json&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">stone_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+        <span class="n">stone_type_data</span> <span class="o">=</span> <span class="n">stone_data</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span>
+        <span class="n">type_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">stone_type_data</span> <span class="k">if</span> <span class="n">s</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="nb">id</span><span class="p">]</span>
+        <span class="n">type_info</span> <span class="o">=</span> <span class="n">type_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">type_data</span> <span class="k">else</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">type_info</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">img_id</span> <span class="o">=</span> <span class="n">type_info</span><span class="p">[</span><span class="s2">&quot;img_id&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name_ja</span> <span class="o">=</span> <span class="n">type_info</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mop_ids</span> <span class="o">=</span> <span class="n">type_info</span><span class="p">[</span><span class="s2">&quot;mops&quot;</span><span class="p">]</span> <span class="c1"># 出現しうるメインオプションIDのリスト</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mop_weights</span> <span class="o">=</span> <span class="n">type_info</span><span class="p">[</span><span class="s2">&quot;mop_weights&quot;</span><span class="p">]</span> <span class="c1"># メインオプションの出現確率</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sop_ids</span> <span class="o">=</span> <span class="n">type_info</span><span class="p">[</span><span class="s2">&quot;sops&quot;</span><span class="p">]</span> <span class="c1"># 出現しうるサブオプションIDのリスト</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sop_weights</span> <span class="o">=</span> <span class="n">type_info</span><span class="p">[</span><span class="s2">&quot;sop_weights&quot;</span><span class="p">]</span> <span class="c1"># サブオプションの出現確率</span>
+
+<div class="viewcode-block" id="StoneType.get_by_id">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.stone.StoneType.get_by_id">[ドキュメント]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_by_id</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;IDからStoneTypeメンバーを取得します。&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">cls</span> <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="nb">id</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span></div>
+</div>
+
+    
+
+<div class="viewcode-block" id="StoneSet">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.stone.StoneSet">[ドキュメント]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">StoneSet</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ストーンのセット効果を定義するEnum。</span>
+<span class="sd">    同じセットのストーンを3つ装備すると、特定のステータスが15%上昇します。</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">HP</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">ATK</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">DEF</span> <span class="o">=</span> <span class="mi">2</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Enumメンバーを初期化し、JSONから詳細データを読み込みます。&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">utils_bot</span><span class="o">.</span><span class="n">sys</span><span class="o">.</span><span class="n">get_game_path</span><span class="p">(</span><span class="s2">&quot;asset/data/stone.json&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">stone_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+        <span class="n">stone_set_data</span> <span class="o">=</span> <span class="n">stone_data</span><span class="p">[</span><span class="s2">&quot;set&quot;</span><span class="p">]</span>
+        <span class="n">set_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">stone_set_data</span> <span class="k">if</span> <span class="n">s</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="nb">id</span><span class="p">]</span>
+        <span class="n">set_info</span> <span class="o">=</span> <span class="n">set_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">set_data</span> <span class="k">else</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">set_info</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">status</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="n">set_info</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">])</span> <span class="c1"># セット効果対象のステータス</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">img_pfx</span> <span class="o">=</span> <span class="n">set_info</span><span class="p">[</span><span class="s2">&quot;img_pfx&quot;</span><span class="p">]</span> <span class="c1"># 画像ファイル名の接頭辞</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name_ja</span> <span class="o">=</span> <span class="n">set_info</span><span class="p">[</span><span class="s2">&quot;name_ja&quot;</span><span class="p">]</span> <span class="c1"># セット名</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name_pfx</span> <span class="o">=</span> <span class="n">set_info</span><span class="p">[</span><span class="s2">&quot;name_pfx&quot;</span><span class="p">]</span> <span class="c1"># ストーン名の接頭辞</span>
+
+<div class="viewcode-block" id="StoneSet.get_by_id">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.stone.StoneSet.get_by_id">[ドキュメント]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_by_id</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;IDからStoneSetメンバーを取得します。&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">cls</span> <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="nb">id</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="OptionData">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.stone.OptionData">[ドキュメント]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OptionData</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;メインオプションとサブオプションの基底クラス。&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">option</span><span class="p">:</span> <span class="n">StoneOption</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="o">|</span><span class="nb">float</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        オプションデータを初期化します。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            option (StoneOption): オプションの種類。</span>
+<span class="sd">            value (int | float): オプションの現在値。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">option</span> <span class="o">=</span> <span class="n">option</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+
+    
+<div class="viewcode-block" id="OptionData.get_display_value">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.stone.OptionData.get_display_value">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_display_value</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        表示用にフォーマットされたオプションの値を文字列として返します。</span>
+<span class="sd">        例: &quot;15.3%&quot; や &quot;125&quot;。</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: フォーマット済みの値。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">option</span><span class="o">.</span><span class="n">sfx</span> <span class="o">==</span> <span class="s2">&quot;%&quot;</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">*=</span> <span class="mi">100</span>
+
+        <span class="c1"># Decimalを使用して浮動小数点数演算の誤差を避け、正確な丸め処理を行う</span>
+        <span class="n">buf</span> <span class="o">=</span> <span class="n">Decimal</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">value</span> <span class="o">*</span> <span class="mi">10</span> <span class="o">**</span> <span class="bp">self</span><span class="o">.</span><span class="n">option</span><span class="o">.</span><span class="n">dp</span><span class="p">)</span> <span class="o">/</span> <span class="mi">10</span> <span class="o">**</span> <span class="bp">self</span><span class="o">.</span><span class="n">option</span><span class="o">.</span><span class="n">dp</span><span class="p">))</span>
+        <span class="n">buf</span> <span class="o">=</span> <span class="n">buf</span><span class="o">.</span><span class="n">quantize</span><span class="p">(</span><span class="n">Decimal</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span> <span class="k">if</span> <span class="n">buf</span> <span class="o">==</span> <span class="n">buf</span><span class="o">.</span><span class="n">to_integral</span><span class="p">()</span> <span class="k">else</span> <span class="n">buf</span><span class="o">.</span><span class="n">normalize</span><span class="p">()</span>
+        
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">buf</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">option</span><span class="o">.</span><span class="n">sfx</span><span class="si">}</span><span class="s1">&#39;</span></div>
+</div>
+
+    
+
+<div class="viewcode-block" id="MainOptionData">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.stone.MainOptionData">[ドキュメント]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MainOptionData</span><span class="p">(</span><span class="n">OptionData</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;ストーンのメインオプションを表すクラス。&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">option</span><span class="p">:</span> <span class="n">StoneOption</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="o">|</span><span class="nb">float</span><span class="o">|</span><span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        メインオプションを初期化します。値が指定されない場合は、基本初期値を使用します。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            option (StoneOption): オプションの種類。</span>
+<span class="sd">            value (int | float | None): オプションの現在値。新規作成時はNone。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">option</span><span class="p">,</span> <span class="n">option</span><span class="o">.</span><span class="n">main_base</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">option</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+    
+<div class="viewcode-block" id="MainOptionData.enhance">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.stone.MainOptionData.enhance">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">enhance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;オプションを1段階強化します。固定の上昇値が加算されます。&quot;&quot;&quot;</span>
+        <span class="n">dp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">option</span><span class="o">.</span><span class="n">dp</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">option</span><span class="o">.</span><span class="n">sfx</span> <span class="o">==</span> <span class="s2">&quot;%&quot;</span><span class="p">:</span>
+            <span class="n">dp</span> <span class="o">+=</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">option</span><span class="o">.</span><span class="n">main_incr</span><span class="p">,</span> <span class="n">dp</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="SubOptionData">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.stone.SubOptionData">[ドキュメント]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SubOptionData</span><span class="p">(</span><span class="n">OptionData</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;ストーンのサブオプションを表すクラス。&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">option</span><span class="p">:</span> <span class="n">StoneOption</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="o">|</span><span class="nb">float</span><span class="o">|</span><span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        サブオプションを初期化します。値が指定されない場合は、ランダムな初期値が設定されます。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            option (StoneOption): オプションの種類。</span>
+<span class="sd">            value (int | float | None): オプションの現在値。新規作成時はNone。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">option</span><span class="p">,</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">option</span><span class="o">.</span><span class="n">sub_incr</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">option</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+    
+<div class="viewcode-block" id="SubOptionData.enhance">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.stone.SubOptionData.enhance">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">enhance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;オプションを1段階強化します。ランダムな上昇値が加算されます。&quot;&quot;&quot;</span>
+        <span class="n">dp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">option</span><span class="o">.</span><span class="n">dp</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">option</span><span class="o">.</span><span class="n">sfx</span> <span class="o">==</span> <span class="s2">&quot;%&quot;</span><span class="p">:</span>
+            <span class="n">dp</span> <span class="o">+=</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">option</span><span class="o">.</span><span class="n">sub_incr</span><span class="p">),</span> <span class="n">dp</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Stone">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.stone.Stone">[ドキュメント]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Stone</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ストーン本体を表すクラス。</span>
+<span class="sd">    生成、強化、経験値管理などのロジックを持ちます。</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lv</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">uuid</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">set</span><span class="p">:</span> <span class="n">StoneSet</span><span class="p">,</span> <span class="nb">type</span><span class="p">:</span> <span class="n">StoneType</span><span class="p">,</span> <span class="n">mop</span><span class="p">:</span> <span class="n">MainOptionData</span><span class="p">,</span> <span class="n">sops</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">SubOptionData</span><span class="p">],</span> <span class="n">exp</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">is_lock</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Stoneオブジェクトを初期化します。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            lv (int): 現在のレベル。</span>
+<span class="sd">            uuid (str): ストーンの一意なID。</span>
+<span class="sd">            set (StoneSet): セット効果の種類。</span>
+<span class="sd">            type (StoneType): 部位の種類。</span>
+<span class="sd">            mop (MainOptionData): メインオプション。</span>
+<span class="sd">            sops (list[SubOptionData]): サブオプションのリスト。</span>
+<span class="sd">            exp (int): 現在のレベルでの蓄積経験値。</span>
+<span class="sd">            is_lock (bool): ロック状態（粉砕・売却防止）。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lv</span> <span class="o">=</span> <span class="n">lv</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uuid</span> <span class="o">=</span> <span class="n">uuid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set</span> <span class="o">=</span> <span class="nb">set</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="nb">type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mop</span> <span class="o">=</span> <span class="n">mop</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sops</span> <span class="o">=</span> <span class="n">sops</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exp</span> <span class="o">=</span> <span class="n">exp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_lock</span> <span class="o">=</span> <span class="n">is_lock</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="nb">set</span><span class="o">.</span><span class="n">name_pfx</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">name_ja</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">img_path</span> <span class="o">=</span> <span class="s2">&quot;stone/&quot;</span> <span class="o">+</span> <span class="nb">set</span><span class="o">.</span><span class="n">img_pfx</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">img_id</span> <span class="o">+</span> <span class="s2">&quot;.png&quot;</span>
+
+
+<div class="viewcode-block" id="Stone.create">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.stone.Stone.create">[ドキュメント]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="nb">set</span><span class="p">:</span> <span class="n">StoneSet</span><span class="p">,</span> <span class="nb">type</span><span class="p">:</span> <span class="n">StoneType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Stone&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        新しいストーンをランダムに生成するファクトリメソッド。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            set (StoneSet): 生成するストーンのセット。</span>
+<span class="sd">            type (StoneType): 生成するストーンの部位。</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Stone: 新しく生成されたStoneオブジェクト。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># メインオプションを確率に基づいて決定</span>
+        <span class="n">mop_id</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choices</span><span class="p">(</span><span class="nb">type</span><span class="o">.</span><span class="n">mop_ids</span><span class="p">,</span> <span class="nb">type</span><span class="o">.</span><span class="n">mop_weights</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># サブオプションを確率に基づいて決定（メインオプションとは重複しない）</span>
+        <span class="n">sops</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">op_qty</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choices</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># サブオプションの初期個数を決定 (3個 or 4個)</span>
+        <span class="n">sop_weights</span> <span class="o">=</span> <span class="nb">type</span><span class="o">.</span><span class="n">sop_weights</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">available_sop_ids</span> <span class="o">=</span> <span class="nb">type</span><span class="o">.</span><span class="n">sop_ids</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">mop_id</span> <span class="ow">in</span> <span class="n">available_sop_ids</span><span class="p">:</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="n">available_sop_ids</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">mop_id</span><span class="p">)</span>
+            <span class="n">sop_weights</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+            <span class="n">available_sop_ids</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">op_qty</span><span class="p">):</span>
+            <span class="n">chosen_sop_id</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choices</span><span class="p">(</span><span class="n">available_sop_ids</span><span class="p">,</span> <span class="n">sop_weights</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">sops</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">SubOptionData</span><span class="p">(</span><span class="n">StoneOption</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="n">chosen_sop_id</span><span class="p">)))</span>
+            
+            <span class="n">idx</span> <span class="o">=</span> <span class="n">available_sop_ids</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">chosen_sop_id</span><span class="p">)</span>
+            <span class="n">sop_weights</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+            <span class="n">available_sop_ids</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+
+        <span class="n">mop</span> <span class="o">=</span> <span class="n">MainOptionData</span><span class="p">(</span><span class="n">StoneOption</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="n">mop_id</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()),</span> <span class="nb">set</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">mop</span><span class="p">,</span> <span class="n">sops</span><span class="p">)</span></div>
+
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_stone_lvup_exp_req</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lv</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;指定レベルから次のレベルに上がるために必要な経験値を取得します。&quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">utils_bot</span><span class="o">.</span><span class="n">sys</span><span class="o">.</span><span class="n">get_game_path</span><span class="p">(</span><span class="s2">&quot;asset/data/stone.json&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">stone_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">lv</span> <span class="o">&lt;</span> <span class="mi">15</span><span class="p">):</span> <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">return</span> <span class="n">stone_data</span><span class="p">[</span><span class="s2">&quot;lvup_exp_table&quot;</span><span class="p">][</span><span class="n">lv</span><span class="p">]</span>
+    
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_stone_lvup_exp_sum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lv</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;レベル1から指定レベルまで上げるために必要な累計経験値を取得します。&quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">utils_bot</span><span class="o">.</span><span class="n">sys</span><span class="o">.</span><span class="n">get_game_path</span><span class="p">(</span><span class="s2">&quot;asset/data/stone.json&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">stone_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">lv</span> <span class="o">&lt;=</span> <span class="mi">15</span><span class="p">):</span> <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">stone_data</span><span class="p">[</span><span class="s2">&quot;lvup_exp_table&quot;</span><span class="p">][:</span><span class="n">lv</span><span class="p">])</span>
+
+<div class="viewcode-block" id="Stone.lvup">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.stone.Stone.lvup">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">lvup</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ストーンを1レベルアップさせ、オプションを強化します。</span>
+<span class="sd">        3の倍数レベルに達した際、サブオプションが追加または強化されます。</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: レベルアップに成功したかどうか。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lv</span> <span class="o">&gt;=</span> <span class="mi">15</span><span class="p">:</span> <span class="k">return</span> <span class="kc">False</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">lv</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mop</span><span class="o">.</span><span class="n">enhance</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lv</span> <span class="o">%</span> <span class="mi">3</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sops</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">:</span>
+                <span class="c1"># 新しいサブオプションを追加</span>
+                <span class="n">current_op_ids</span> <span class="o">=</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mop</span><span class="o">.</span><span class="n">option</span><span class="o">.</span><span class="n">id</span><span class="p">}</span> <span class="o">|</span> <span class="p">{</span><span class="n">sop</span><span class="o">.</span><span class="n">option</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">sop</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sops</span><span class="p">}</span>
+                <span class="n">available_sops</span> <span class="o">=</span> <span class="p">[(</span><span class="n">sop_id</span><span class="p">,</span> <span class="n">weight</span><span class="p">)</span> <span class="k">for</span> <span class="n">sop_id</span><span class="p">,</span> <span class="n">weight</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">sop_ids</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">sop_weights</span><span class="p">)</span> <span class="k">if</span> <span class="n">sop_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">current_op_ids</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">available_sops</span><span class="p">:</span>
+                    <span class="n">new_op_id</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choices</span><span class="p">([</span><span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">available_sops</span><span class="p">],</span> <span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">available_sops</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">sops</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">SubOptionData</span><span class="p">(</span><span class="n">StoneOption</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="n">new_op_id</span><span class="p">)))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># 既存のサブオプションをランダムに強化</span>
+                <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sops</span><span class="p">)</span><span class="o">.</span><span class="n">enhance</span><span class="p">()</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="Stone.calc_lvup">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.stone.Stone.calc_lvup">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">calc_lvup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exp_item_value</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        指定された数の経験値アイテムを使用した場合のレベルアップ結果を計算（プレビュー）します。</span>
+<span class="sd">        実際の経験値やレベルは変更しません。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            exp_item_value (int): 使用する経験値アイテムの数。</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple[int, int]: (上昇するレベル数, 実際に消費されるアイテム数)。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">lvup_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">exp_item_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">exp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exp</span>
+        <span class="n">current_lv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lv</span>
+
+        <span class="c1"># まず、現在の余剰経験値でレベルアップできるかチェック</span>
+        <span class="k">while</span> <span class="p">(</span><span class="n">req_exp</span> <span class="o">:=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_stone_lvup_exp_req</span><span class="p">(</span><span class="n">current_lv</span><span class="p">))</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">exp</span> <span class="o">&gt;=</span> <span class="n">req_exp</span><span class="p">:</span>
+            <span class="n">exp</span> <span class="o">-=</span> <span class="n">req_exp</span>
+            <span class="n">current_lv</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">lvup_count</span> <span class="o">+=</span> <span class="mi">1</span>
+        
+        <span class="c1"># 次に、アイテムを1つずつ消費して計算</span>
+        <span class="k">while</span> <span class="n">current_lv</span> <span class="o">&lt;</span> <span class="mi">15</span> <span class="ow">and</span> <span class="n">exp_item_count</span> <span class="o">&lt;</span> <span class="n">exp_item_value</span><span class="p">:</span>
+            <span class="n">exp</span> <span class="o">+=</span> <span class="mi">250</span>
+            <span class="n">exp_item_count</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">while</span> <span class="p">(</span><span class="n">req_exp</span> <span class="o">:=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_stone_lvup_exp_req</span><span class="p">(</span><span class="n">current_lv</span><span class="p">))</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="n">exp</span> <span class="o">&gt;=</span> <span class="n">req_exp</span><span class="p">:</span>
+                <span class="n">exp</span> <span class="o">-=</span> <span class="n">req_exp</span>
+                <span class="n">current_lv</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">lvup_count</span> <span class="o">+=</span> <span class="mi">1</span>
+        
+        <span class="k">return</span> <span class="n">lvup_count</span><span class="p">,</span> <span class="n">exp_item_count</span></div>
+
+
+<div class="viewcode-block" id="Stone.give_exp">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.stone.Stone.give_exp">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">give_exp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exp_amount</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ストーンに経験値を付与し、必要であればレベルアップ処理を呼び出します。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            exp_amount (int): 付与する経験値量。</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: 上昇したレベル数。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">exp</span> <span class="o">+=</span> <span class="n">exp_amount</span>
+        <span class="n">lvup_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="p">(</span><span class="n">req_exp</span> <span class="o">:=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_stone_lvup_exp_req</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lv</span><span class="p">))</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">exp</span> <span class="o">&gt;=</span> <span class="n">req_exp</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">exp</span> <span class="o">-=</span> <span class="n">req_exp</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lvup</span><span class="p">()</span>
+            <span class="n">lvup_count</span> <span class="o">+=</span> <span class="mi">1</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lv</span> <span class="o">&gt;=</span> <span class="mi">15</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">exp</span> <span class="o">=</span> <span class="mi">0</span>
+            
+        <span class="k">return</span> <span class="n">lvup_count</span></div>
+
+    
+<div class="viewcode-block" id="Stone.convert_to_exp">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.stone.Stone.convert_to_exp">[ドキュメント]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">convert_to_exp</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        このストーンを粉砕した場合に得られる総経験値を計算します。</span>
+<span class="sd">        (基本経験値 + レベルアップに必要な累計経験値 + 現在の余剰経験値)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: 総経験値。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mi">1500</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_stone_lvup_exp_sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lv</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">exp</span></div>
+</div>
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, qr0.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

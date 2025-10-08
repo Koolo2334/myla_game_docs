@@ -1,0 +1,31 @@
+src package
+===========
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   src.cog
+   src.myla_game
+   src.utils
+
+Submodules
+----------
+
+src.cogs module
+---------------
+
+.. automodule:: src.cogs
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: src
+   :members:
+   :undoc-members:
+   :show-inheritance:

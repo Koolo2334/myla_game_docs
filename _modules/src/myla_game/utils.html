@@ -1,0 +1,533 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="ja" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.myla_game.utils &mdash; myla_game 1.6 ドキュメント</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=044f9cdb"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/translations.js?v=4755f45a"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../../genindex.html" />
+    <link rel="search" title="検索" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            myla_game
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../src.html">src package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">myla_game</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">モジュールコード</a></li>
+      <li class="breadcrumb-item active">src.myla_game.utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>src.myla_game.utils のソースコード</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">ゲームのデータアクセスレイヤー(DAL)として機能するユーティリティモジュール。</span>
+
+<span class="sd">このモジュールは、プレイヤーの動的データ（data/*.json）および</span>
+<span class="sd">ゲームの静的データ（asset/data/*.json）の読み込み、書き込み、更新を</span>
+<span class="sd">一元的に管理する関数群を提供します。</span>
+
+<span class="sd">`cog`層や他の`myla_game`層のモジュールは、原則としてこのモジュールを通じて</span>
+<span class="sd">データにアクセスすることで、データ永続化のロジックを抽象化します。</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">utils</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pytz</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">character</span><span class="p">,</span> <span class="n">weapon</span><span class="p">,</span> <span class="n">stone</span><span class="p">,</span> <span class="n">party</span>
+
+<span class="c1"># --- 静的データ取得関数 (asset/data/*.json) ---</span>
+
+<div class="viewcode-block" id="get_character_data_by_id">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.utils.get_character_data_by_id">[ドキュメント]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_character_data_by_id</span><span class="p">(</span><span class="nb">id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    指定されたIDを持つキャラクターの静的データを `asset/data/character.json` から取得します。</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        id (int): 取得したいキャラクターのID。</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict | None: 見つかったキャラクターのデータ辞書。見つからない場合はNone。</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">sys</span><span class="o">.</span><span class="n">get_game_path</span><span class="p">(</span><span class="s2">&quot;asset/data/character.json&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">character_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    
+    <span class="c1"># プレイヤーキャラクターと敵キャラクターの両方を検索対象に含める</span>
+    <span class="n">characters</span> <span class="o">=</span> <span class="n">character_data</span><span class="p">[</span><span class="s2">&quot;player&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">character_data</span><span class="p">[</span><span class="s2">&quot;enemy&quot;</span><span class="p">]</span>
+    <span class="n">characters</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">characters</span> <span class="k">if</span> <span class="n">c</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="nb">id</span><span class="p">]</span>
+    
+    <span class="k">return</span> <span class="n">characters</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">characters</span> <span class="k">else</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="get_weapon_data_by_id">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.utils.get_weapon_data_by_id">[ドキュメント]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_weapon_data_by_id</span><span class="p">(</span><span class="nb">id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    指定されたIDを持つ武器の静的データを `asset/data/weapon.json` から取得します。</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        id (int): 取得したい武器のID。</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict | None: 見つかった武器のデータ辞書。見つからない場合はNone。</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">sys</span><span class="o">.</span><span class="n">get_game_path</span><span class="p">(</span><span class="s2">&quot;asset/data/weapon.json&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">weapon_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    
+    <span class="n">weapons</span> <span class="o">=</span> <span class="n">weapon_data</span><span class="p">[</span><span class="s2">&quot;list&quot;</span><span class="p">]</span>
+    <span class="n">weapons</span> <span class="o">=</span> <span class="p">[</span><span class="n">w</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">weapons</span> <span class="k">if</span> <span class="n">w</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="nb">id</span><span class="p">]</span>
+    
+    <span class="k">return</span> <span class="n">weapons</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">weapons</span> <span class="k">else</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="get_stone_option_data_by_id">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.utils.get_stone_option_data_by_id">[ドキュメント]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_stone_option_data_by_id</span><span class="p">(</span><span class="nb">id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    指定されたIDを持つストーンオプションの静的データを `asset/data/stone.json` から取得します。</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        id (int): 取得したいストーンオプションのID。</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict | None: 見つかったストーンオプションのデータ辞書。見つからない場合はNone。</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">sys</span><span class="o">.</span><span class="n">get_game_path</span><span class="p">(</span><span class="s2">&quot;asset/data/stone.json&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">stone_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    
+    <span class="n">stone_option_data</span> <span class="o">=</span> <span class="n">stone_data</span><span class="p">[</span><span class="s2">&quot;option&quot;</span><span class="p">]</span>
+    <span class="n">stone_option_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">stone_option_data</span> <span class="k">if</span> <span class="n">s</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="nb">id</span><span class="p">]</span>
+    
+    <span class="k">return</span> <span class="n">stone_option_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">stone_option_data</span> <span class="k">else</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="get_item_data_by_id">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.utils.get_item_data_by_id">[ドキュメント]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_item_data_by_id</span><span class="p">(</span><span class="nb">id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    指定されたIDを持つアイテムの静的データを `asset/data/item.json` から取得します。</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        id (int): 取得したいアイテムのID。</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict | None: 見つかったアイテムのデータ辞書。見つからない場合はNone。</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">sys</span><span class="o">.</span><span class="n">get_game_path</span><span class="p">(</span><span class="s2">&quot;asset/data/item.json&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">item_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    
+    <span class="n">items</span> <span class="o">=</span> <span class="n">item_data</span><span class="p">[</span><span class="s2">&quot;list&quot;</span><span class="p">]</span>
+    <span class="n">items</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">items</span> <span class="k">if</span> <span class="n">i</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="nb">id</span><span class="p">]</span>
+    
+    <span class="k">return</span> <span class="n">items</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">items</span> <span class="k">else</span> <span class="kc">None</span></div>
+
+
+
+<span class="c1"># --- プレイヤーデータ取得/確認関数 (data/*.json) ---</span>
+
+<div class="viewcode-block" id="has_player_character_by_id">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.utils.has_player_character_by_id">[ドキュメント]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">has_player_character_by_id</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    プレイヤーが指定されたIDのキャラクターを所持しているかを確認します。</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        user_id (int): プレイヤーのDiscordユーザーID。</span>
+<span class="sd">        id (int): 確認したいキャラクターのID。</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: 所持している場合はTrue、そうでない場合はFalse。</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">sys</span><span class="o">.</span><span class="n">get_game_path</span><span class="p">(</span><span class="s2">&quot;data/character.json&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">character_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    
+    <span class="n">characters</span> <span class="o">=</span> <span class="n">character_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">user_id</span><span class="p">),</span> <span class="p">[])</span>
+    <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="nb">id</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">characters</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_player_character">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.utils.get_player_character">[ドキュメント]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_player_character</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">uuid</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">weapon_uuid</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    プレイヤーが所持する特定のキャラクターのインスタンスを生成して返します。</span>
+<span class="sd">    武器UUIDが指定された場合は、その武器も装備した状態でインスタンス化します。</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        user_id (int): プレイヤーのDiscordユーザーID。</span>
+<span class="sd">        uuid (str): 取得したいキャラクターのユニークID。</span>
+<span class="sd">        weapon_uuid (str | None, optional): 装備させる武器のユニークID。Defaults to None.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        character.PlayerCharacter | None: 生成されたキャラクターオブジェクト。見つからない場合はNone。</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">sys</span><span class="o">.</span><span class="n">get_game_path</span><span class="p">(</span><span class="s2">&quot;data/character.json&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">character_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    
+    <span class="n">characters</span> <span class="o">=</span> <span class="n">character_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">user_id</span><span class="p">),</span> <span class="p">[])</span>
+    <span class="n">target_char_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">characters</span> <span class="k">if</span> <span class="n">c</span><span class="p">[</span><span class="s2">&quot;uuid&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">uuid</span><span class="p">]</span>
+    
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">target_char_data</span><span class="p">:</span> <span class="k">return</span> <span class="kc">None</span>
+    
+    <span class="n">char_data</span> <span class="o">=</span> <span class="n">target_char_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    
+    <span class="n">wep</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">weapon_uuid</span><span class="p">:</span>
+        <span class="n">wep</span> <span class="o">=</span> <span class="n">get_player_weapon</span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span> <span class="n">weapon_uuid</span><span class="p">)</span>
+        <span class="c1"># 武器の職業とキャラクターの職業が一致しない場合は装備させない</span>
+        <span class="k">if</span> <span class="n">wep</span> <span class="ow">and</span> <span class="n">wep</span><span class="o">.</span><span class="n">job</span> <span class="o">!=</span> <span class="n">character</span><span class="o">.</span><span class="n">PlayerCharacter</span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span> <span class="o">**</span><span class="n">char_data</span><span class="p">)</span><span class="o">.</span><span class="n">job</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="c1"># ストーンを装備した状態でインスタンス化</span>
+    <span class="n">stones</span> <span class="o">=</span> <span class="p">[</span><span class="n">get_player_stone</span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span> <span class="n">s_uuid</span><span class="p">)</span> <span class="k">for</span> <span class="n">s_uuid</span> <span class="ow">in</span> <span class="n">char_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;stone&quot;</span><span class="p">,</span> <span class="p">[])</span> <span class="k">if</span> <span class="n">s_uuid</span><span class="p">]</span>
+    
+    <span class="k">return</span> <span class="n">character</span><span class="o">.</span><span class="n">PlayerCharacter</span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span> <span class="n">weapon</span><span class="o">=</span><span class="n">wep</span><span class="p">,</span> <span class="n">stone</span><span class="o">=</span><span class="n">stones</span><span class="p">,</span> <span class="o">**</span><span class="n">char_data</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_player_weapon">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.utils.get_player_weapon">[ドキュメント]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_player_weapon</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">uuid</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    プレイヤーが所持する特定の武器のインスタンスを生成して返します。</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        user_id (int): プレイヤーのDiscordユーザーID。</span>
+<span class="sd">        uuid (str): 取得したい武器のユニークID。</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        weapon.Weapon | None: 生成された武器オブジェクト。見つからない場合はNone。</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">sys</span><span class="o">.</span><span class="n">get_game_path</span><span class="p">(</span><span class="s2">&quot;data/weapon.json&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">weapon_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    
+    <span class="n">weapons</span> <span class="o">=</span> <span class="n">weapon_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">user_id</span><span class="p">),</span> <span class="p">[])</span>
+    <span class="n">target_weapon_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">w</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">weapons</span> <span class="k">if</span> <span class="n">w</span><span class="p">[</span><span class="s2">&quot;uuid&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">uuid</span><span class="p">]</span>
+    
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">target_weapon_data</span><span class="p">:</span> <span class="k">return</span> <span class="kc">None</span>
+    
+    <span class="k">return</span> <span class="n">weapon</span><span class="o">.</span><span class="n">Weapon</span><span class="p">(</span><span class="o">**</span><span class="n">target_weapon_data</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+
+
+
+<div class="viewcode-block" id="get_player_stone">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.utils.get_player_stone">[ドキュメント]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_player_stone</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">uuid</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    プレイヤーが所持する特定のストーンのインスタンスを生成して返します。</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        user_id (int): プレイヤーのDiscordユーザーID。</span>
+<span class="sd">        uuid (str): 取得したいストーンのユニークID。</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        stone.Stone | None: 生成されたストーンオブジェクト。見つからない場合はNone。</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">sys</span><span class="o">.</span><span class="n">get_game_path</span><span class="p">(</span><span class="s2">&quot;data/stone.json&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">stone_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        
+    <span class="n">stones</span> <span class="o">=</span> <span class="n">stone_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">user_id</span><span class="p">),</span> <span class="p">[])</span>
+    <span class="n">target_stone_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">stones</span> <span class="k">if</span> <span class="n">s</span><span class="p">[</span><span class="s2">&quot;uuid&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">uuid</span><span class="p">]</span>
+    
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">target_stone_data</span><span class="p">:</span> <span class="k">return</span> <span class="kc">None</span>
+    
+    <span class="n">s_data</span> <span class="o">=</span> <span class="n">target_stone_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="c1"># JSONから読み込んだデータを元に各オブジェクトを再構築</span>
+    <span class="n">mop</span> <span class="o">=</span> <span class="n">stone</span><span class="o">.</span><span class="n">MainOptionData</span><span class="p">(</span><span class="n">stone</span><span class="o">.</span><span class="n">StoneOption</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="n">s_data</span><span class="p">[</span><span class="s2">&quot;mop&quot;</span><span class="p">][</span><span class="s2">&quot;option&quot;</span><span class="p">]),</span> <span class="n">s_data</span><span class="p">[</span><span class="s2">&quot;mop&quot;</span><span class="p">][</span><span class="s2">&quot;value&quot;</span><span class="p">])</span>
+    <span class="n">sops</span> <span class="o">=</span> <span class="p">[</span><span class="n">stone</span><span class="o">.</span><span class="n">SubOptionData</span><span class="p">(</span><span class="n">stone</span><span class="o">.</span><span class="n">StoneOption</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="n">sop</span><span class="p">[</span><span class="s2">&quot;option&quot;</span><span class="p">]),</span> <span class="n">sop</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">])</span> <span class="k">for</span> <span class="n">sop</span> <span class="ow">in</span> <span class="n">s_data</span><span class="p">[</span><span class="s2">&quot;sops&quot;</span><span class="p">]]</span>
+    
+    <span class="k">return</span> <span class="n">stone</span><span class="o">.</span><span class="n">Stone</span><span class="p">(</span>
+        <span class="nb">set</span><span class="o">=</span><span class="n">stone</span><span class="o">.</span><span class="n">StoneSet</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="n">s_data</span><span class="p">[</span><span class="s2">&quot;set&quot;</span><span class="p">]),</span>
+        <span class="nb">type</span><span class="o">=</span><span class="n">stone</span><span class="o">.</span><span class="n">StoneType</span><span class="o">.</span><span class="n">get_by_id</span><span class="p">(</span><span class="n">s_data</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]),</span>
+        <span class="n">mop</span><span class="o">=</span><span class="n">mop</span><span class="p">,</span> <span class="n">sops</span><span class="o">=</span><span class="n">sops</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="n">k</span><span class="p">:</span><span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">s_data</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;set&quot;</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="s2">&quot;mop&quot;</span><span class="p">,</span> <span class="s2">&quot;sops&quot;</span><span class="p">]}</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_player_party">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.utils.get_player_party">[ドキュメント]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_player_party</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">uuid</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    プレイヤーが編成した特定のパーティーのインスタンスを生成して返します。</span>
+<span class="sd">    パーティー内のキャラクターや装備も再帰的に読み込み、完全にインスタンス化します。</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        user_id (int): プレイヤーのDiscordユーザーID。</span>
+<span class="sd">        uuid (str): 取得したいパーティーのユニークID。</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        party.PlayerParty | None: 生成されたパーティーオブジェクト。見つからない場合はNone。</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">sys</span><span class="o">.</span><span class="n">get_game_path</span><span class="p">(</span><span class="s2">&quot;data/party.json&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">party_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        
+    <span class="n">parties</span> <span class="o">=</span> <span class="n">party_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">user_id</span><span class="p">),</span> <span class="p">[])</span>
+    <span class="n">target_party_data</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">parties</span> <span class="k">if</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;uuid&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">uuid</span><span class="p">]</span>
+    
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">target_party_data</span><span class="p">:</span> <span class="k">return</span> <span class="kc">None</span>
+    
+    <span class="n">p_data</span> <span class="o">=</span> <span class="n">target_party_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">characters_in_party</span> <span class="o">=</span> <span class="p">[</span><span class="n">get_player_character</span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span> <span class="n">c</span><span class="p">[</span><span class="s2">&quot;uuid&quot;</span><span class="p">],</span> <span class="n">c</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;weapon&quot;</span><span class="p">))</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">p_data</span><span class="p">[</span><span class="s2">&quot;characters&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">c</span><span class="p">]</span>
+    
+    <span class="k">return</span> <span class="n">party</span><span class="o">.</span><span class="n">PlayerParty</span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span> <span class="n">characters_in_party</span><span class="p">,</span> <span class="n">p_data</span><span class="p">[</span><span class="s2">&quot;uuid&quot;</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="get_player_all_parties">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.utils.get_player_all_parties">[ドキュメント]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_player_all_parties</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;プレイヤーが所持するすべてのパーティーを取得します。&quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">sys</span><span class="o">.</span><span class="n">get_game_path</span><span class="p">(</span><span class="s2">&quot;data/party.json&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">party_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="n">party_data_list</span> <span class="o">=</span> <span class="n">party_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">user_id</span><span class="p">),</span> <span class="p">[])</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">get_player_party</span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;uuid&quot;</span><span class="p">])</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">party_data_list</span><span class="p">]</span></div>
+
+
+<span class="c1"># ... (他のデータ取得関数も同様にコメント) ...</span>
+
+<span class="c1"># --- データ変更/付与関数 ---</span>
+
+<div class="viewcode-block" id="give_gold">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.utils.give_gold">[ドキュメント]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">give_gold</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    プレイヤーの所持ゴールドを増減させます。</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        user_id (int): プレイヤーのDiscordユーザーID。</span>
+<span class="sd">        value (int): 増減させるゴールドの量。負の値も可。</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: 操作が成功した場合はTrue。ゴールドがマイナスになるなど失敗した場合はFalse。</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">sys</span><span class="o">.</span><span class="n">get_game_path</span><span class="p">(</span><span class="s2">&quot;data/gold.json&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">gold_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    
+    <span class="n">player_gold</span> <span class="o">=</span> <span class="n">gold_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">user_id</span><span class="p">),</span> <span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;in_hour&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
+    
+    <span class="k">if</span> <span class="n">player_gold</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+        
+    <span class="n">player_gold</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">value</span>
+    <span class="n">gold_data</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">user_id</span><span class="p">)]</span> <span class="o">=</span> <span class="n">player_gold</span>
+    
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">sys</span><span class="o">.</span><span class="n">get_game_path</span><span class="p">(</span><span class="s2">&quot;data/gold.json&quot;</span><span class="p">),</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">gold_data</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="give_player_character">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.utils.give_player_character">[ドキュメント]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">give_player_character</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    プレイヤーにキャラクターを付与します。</span>
+<span class="sd">    既に所持している場合は、凸数を進めます。</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        user_id (int): プレイヤーのDiscordユーザーID。</span>
+<span class="sd">        id (int): 付与するキャラクターのID。</span>
+<span class="sd">        value (int): 付与する数（通常は1）。</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        int: 操作後のキャラクターの凸数 (新規獲得の場合は0)。</span>
+<span class="sd">             -1の場合はエラーまたは最大凸数を超えていることを示す。</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">sys</span><span class="o">.</span><span class="n">get_game_path</span><span class="p">(</span><span class="s2">&quot;data/character.json&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">character_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        
+    <span class="n">player_chars</span> <span class="o">=</span> <span class="n">character_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">user_id</span><span class="p">),</span> <span class="p">[])</span>
+    
+    <span class="n">existing_char</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">player_chars</span> <span class="k">if</span> <span class="n">c</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="nb">id</span><span class="p">]</span>
+    
+    <span class="k">if</span> <span class="n">existing_char</span><span class="p">:</span>
+        <span class="c1"># 既に所持している場合 -&gt; 凸数を進める</span>
+        <span class="n">char_to_update</span> <span class="o">=</span> <span class="n">existing_char</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">char_to_update</span><span class="p">[</span><span class="s2">&quot;count&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">7</span><span class="p">:</span> <span class="k">return</span> <span class="o">-</span><span class="mi">1</span> <span class="c1"># 最大凸</span>
+        <span class="n">char_to_update</span><span class="p">[</span><span class="s2">&quot;count&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">value</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="n">char_to_update</span><span class="p">[</span><span class="s2">&quot;count&quot;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># 新規獲得の場合</span>
+        <span class="n">new_char</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="nb">id</span><span class="p">,</span>
+            <span class="s2">&quot;lv&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;exp&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;uuid&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()),</span>
+            <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;stone&quot;</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="p">}</span>
+        <span class="n">player_chars</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_char</span><span class="p">)</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+        
+    <span class="n">character_data</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">user_id</span><span class="p">)]</span> <span class="o">=</span> <span class="n">player_chars</span>
+    
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">sys</span><span class="o">.</span><span class="n">get_game_path</span><span class="p">(</span><span class="s2">&quot;data/character.json&quot;</span><span class="p">),</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">character_data</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        
+    <span class="k">return</span> <span class="n">count</span></div>
+
+
+<div class="viewcode-block" id="give_player_stone">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.utils.give_player_stone">[ドキュメント]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">give_player_stone</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">stone_obj</span><span class="p">:</span> <span class="n">stone</span><span class="o">.</span><span class="n">Stone</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    プレイヤーにストーンを追加または更新します。</span>
+<span class="sd">    同じUUIDのストーンが既に存在する場合は上書きされ、レベルやロック状態の更新に使用できます。</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        user_id (int): プレイヤーのDiscordユーザーID。</span>
+<span class="sd">        stone_obj (stone.Stone): 保存するStoneオブジェクト。</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">sys</span><span class="o">.</span><span class="n">get_game_path</span><span class="p">(</span><span class="s2">&quot;data/stone.json&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">stone_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    
+    <span class="n">player_stones</span> <span class="o">=</span> <span class="n">stone_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">user_id</span><span class="p">),</span> <span class="p">[])</span>
+    
+    <span class="c1"># オブジェクトをJSONシリアライズ可能な辞書に変換</span>
+    <span class="n">stone_dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;uuid&quot;</span><span class="p">:</span> <span class="n">stone_obj</span><span class="o">.</span><span class="n">uuid</span><span class="p">,</span> <span class="s2">&quot;lv&quot;</span><span class="p">:</span> <span class="n">stone_obj</span><span class="o">.</span><span class="n">lv</span><span class="p">,</span> <span class="s2">&quot;exp&quot;</span><span class="p">:</span> <span class="n">stone_obj</span><span class="o">.</span><span class="n">exp</span><span class="p">,</span> <span class="s2">&quot;is_lock&quot;</span><span class="p">:</span> <span class="n">stone_obj</span><span class="o">.</span><span class="n">is_lock</span><span class="p">,</span>
+        <span class="s2">&quot;set&quot;</span><span class="p">:</span> <span class="n">stone_obj</span><span class="o">.</span><span class="n">set</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">stone_obj</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+        <span class="s2">&quot;mop&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;option&quot;</span><span class="p">:</span> <span class="n">stone_obj</span><span class="o">.</span><span class="n">mop</span><span class="o">.</span><span class="n">option</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">stone_obj</span><span class="o">.</span><span class="n">mop</span><span class="o">.</span><span class="n">value</span><span class="p">},</span>
+        <span class="s2">&quot;sops&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;option&quot;</span><span class="p">:</span> <span class="n">sop</span><span class="o">.</span><span class="n">option</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">sop</span><span class="o">.</span><span class="n">value</span><span class="p">}</span> <span class="k">for</span> <span class="n">sop</span> <span class="ow">in</span> <span class="n">stone_obj</span><span class="o">.</span><span class="n">sops</span><span class="p">]</span>
+    <span class="p">}</span>
+    
+    <span class="c1"># 既存のストーンを探して更新、なければ追加</span>
+    <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">player_stones</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">s</span><span class="p">[</span><span class="s2">&quot;uuid&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">stone_obj</span><span class="o">.</span><span class="n">uuid</span><span class="p">:</span>
+            <span class="n">player_stones</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">stone_dict</span>
+            <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">break</span>
+            
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">found</span><span class="p">:</span>
+        <span class="n">player_stones</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stone_dict</span><span class="p">)</span>
+        
+    <span class="n">stone_data</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">user_id</span><span class="p">)]</span> <span class="o">=</span> <span class="n">player_stones</span>
+    
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">sys</span><span class="o">.</span><span class="n">get_game_path</span><span class="p">(</span><span class="s2">&quot;data/stone.json&quot;</span><span class="p">),</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">stone_data</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="give_player_party">
+<a class="viewcode-back" href="../../../src.myla_game.html#src.myla_game.utils.give_player_party">[ドキュメント]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">give_player_party</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">party_obj</span><span class="p">:</span> <span class="n">party</span><span class="o">.</span><span class="n">Party</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    プレイヤーのパーティー編成を保存または更新します。</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        user_id (int): プレイヤーのDiscordユーザーID。</span>
+<span class="sd">        party_obj (party.Party): 保存するPartyオブジェクト。</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">sys</span><span class="o">.</span><span class="n">get_game_path</span><span class="p">(</span><span class="s2">&quot;data/party.json&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">party_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        
+    <span class="n">player_parties</span> <span class="o">=</span> <span class="n">party_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">user_id</span><span class="p">),</span> <span class="p">[])</span>
+    
+    <span class="c1"># PartyオブジェクトをJSONシリアライズ可能な辞書に変換</span>
+    <span class="n">party_dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;uuid&quot;</span><span class="p">:</span> <span class="n">party_obj</span><span class="o">.</span><span class="n">uuid</span><span class="p">,</span>
+        <span class="s2">&quot;characters&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span><span class="s2">&quot;uuid&quot;</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">uuid</span><span class="p">,</span> <span class="s2">&quot;weapon&quot;</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">weapon</span><span class="o">.</span><span class="n">uuid</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">weapon</span> <span class="k">else</span> <span class="kc">None</span><span class="p">}</span> <span class="k">if</span> <span class="n">c</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">party_obj</span><span class="o">.</span><span class="n">characters</span>
+        <span class="p">]</span>
+    <span class="p">}</span>
+
+    <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">player_parties</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;uuid&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">party_obj</span><span class="o">.</span><span class="n">uuid</span><span class="p">:</span>
+            <span class="n">player_parties</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">party_dict</span>
+            <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">break</span>
+    
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">found</span><span class="p">:</span>
+        <span class="n">player_parties</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">party_dict</span><span class="p">)</span>
+        
+    <span class="n">party_data</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">user_id</span><span class="p">)]</span> <span class="o">=</span> <span class="n">player_parties</span>
+    
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">sys</span><span class="o">.</span><span class="n">get_game_path</span><span class="p">(</span><span class="s2">&quot;data/party.json&quot;</span><span class="p">),</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">party_data</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, qr0.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

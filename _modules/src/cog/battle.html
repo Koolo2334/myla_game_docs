@@ -1,0 +1,525 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="ja" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.cog.battle &mdash; myla_game 1.6 ドキュメント</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=044f9cdb"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/translations.js?v=4755f45a"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../../genindex.html" />
+    <link rel="search" title="検索" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            myla_game
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../src.html">src package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">myla_game</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">モジュールコード</a></li>
+      <li class="breadcrumb-item active">src.cog.battle</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>src.cog.battle のソースコード</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">ワールドチャンネルでの敵とのエンカウントおよびPvE戦闘のUIフローを管理するCog。</span>
+<span class="sd">定期的に敵をスポーンさせ、ユーザーがそれに対して戦闘を開始できるようにします。</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">discord</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">discord</span><span class="w"> </span><span class="kn">import</span> <span class="n">app_commands</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">discord.interactions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Interaction</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">discord.ext</span><span class="w"> </span><span class="kn">import</span> <span class="n">commands</span><span class="p">,</span> <span class="n">tasks</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">utils</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..myla_game</span><span class="w"> </span><span class="kn">import</span> <span class="n">myla_game</span> <span class="k">as</span> <span class="n">game</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">aiofiles</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+
+
+<div class="viewcode-block" id="ViewEnemySpawn">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.battle.ViewEnemySpawn">[ドキュメント]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ViewEnemySpawn</span><span class="p">(</span><span class="n">discord</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">View</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;敵が出現した際に表示されるViewコンポーネント。</span>
+<span class="sd">    </span>
+<span class="sd">    「戦う」ボタンを提供し、押下されると戦闘準備フローを開始します。</span>
+<span class="sd">    タイムアウトは1800秒（30分）で、時間内に誰も戦闘を開始しなければ消滅します。</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+        
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pve_obj</span><span class="p">:</span> <span class="n">PvE</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mi">180</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;ViewEnemySpawnのコンストラクタ。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            pve_obj (PvE): このViewに対応するPvEセッションのインスタンス。</span>
+<span class="sd">            timeout (float | None, optional): Viewがタイムアウトするまでの秒数。デフォルトは180秒。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pve_obj</span> <span class="o">=</span> <span class="n">pve_obj</span>
+
+
+<div class="viewcode-block" id="ViewEnemySpawn.select_party">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.battle.ViewEnemySpawn.select_party">[ドキュメント]</a>
+    <span class="nd">@discord</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">button</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="n">discord</span><span class="o">.</span><span class="n">ButtonStyle</span><span class="o">.</span><span class="n">blurple</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;戦う&quot;</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">select_party</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">int</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">Interaction</span><span class="p">,</span> <span class="n">button</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">Button</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;「戦う」ボタンが押された際のコールバック関数。</span>
+
+<span class="sd">        まだ誰もこの敵との戦闘を開始していない場合、パーティー選択フローを開始します。</span>
+<span class="sd">        すでに応答済みの場合は何もしません。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            int (discord.Interaction): ボタンを押したユーザーとのインタラクション。</span>
+<span class="sd">            button (discord.ui.Button): 押されたボタンのインスタンス。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># すでに他のプレイヤーが応戦している場合は何もしない</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pve_obj</span><span class="o">.</span><span class="n">player</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">await</span> <span class="nb">int</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="s2">&quot;このモンスターとの戦闘はすでに開始されています。&quot;</span><span class="p">,</span> <span class="n">ephemeral</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="c1"># PvEフローのパーティー選択部分を開始する</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">pve_obj</span><span class="o">.</span><span class="n">select_party</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="PvE">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.battle.PvE">[ドキュメント]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PvE</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;PvE（Player versus Environment）戦闘のフロー全体を管理するクラス。</span>
+<span class="sd">    </span>
+<span class="sd">    パーティー選択UIの表示、戦闘の開始、戦闘画面の更新、終了までを一貫して扱います。</span>
+<span class="sd">    このクラス自体は汎用的なフローを定義し、具体的な敵の構成や報酬は</span>
+<span class="sd">    `dungeon.py`などのサブクラスで実装されます。</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># 現在、何らかの戦闘フローに参加しているプレイヤーのIDリスト</span>
+    <span class="c1"># プレイヤーが複数の戦闘を同時に開始することを防ぐ</span>
+    <span class="n">players_id</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;PvEセッションを初期化します。&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">player</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">User</span> <span class="o">|</span> <span class="n">discord</span><span class="o">.</span><span class="n">Member</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">player_party</span><span class="p">:</span> <span class="n">game</span><span class="o">.</span><span class="n">PlayerParty</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enemy_party</span><span class="p">:</span> <span class="n">game</span><span class="o">.</span><span class="n">EnemyParty</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">battle</span><span class="p">:</span> <span class="n">game</span><span class="o">.</span><span class="n">Battle</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interaction</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">Interaction</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<div class="viewcode-block" id="PvE.ViewSelectParty">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.battle.PvE.ViewSelectParty">[ドキュメント]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">ViewSelectParty</span><span class="p">(</span><span class="n">discord</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">View</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;プレイヤーに戦闘で使用するパーティーを選択させるためのView。&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="PvE.ViewSelectParty.SelectParty">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.battle.PvE.ViewSelectParty.SelectParty">[ドキュメント]</a>
+        <span class="k">class</span><span class="w"> </span><span class="nc">SelectParty</span><span class="p">(</span><span class="n">discord</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">Select</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;パーティーを選択するドロップダウンメニュー。&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="PvE.ViewSelectParty.SelectParty.callback">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.battle.PvE.ViewSelectParty.SelectParty.callback">[ドキュメント]</a>
+            <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">callback</span><span class="p">(</span><span class="n">select</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">Select</span><span class="p">,</span> <span class="n">interaction</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">Interaction</span><span class="p">):</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot;パーティーが選択された際のコールバック関数。</span>
+<span class="sd">                </span>
+<span class="sd">                選択したユーザーが戦闘開始者本人であることを確認し、戦闘を開始します。</span>
+<span class="sd">                &quot;&quot;&quot;</span>
+                <span class="c1"># 操作者が戦闘開始者でなければ無視</span>
+                <span class="k">if</span> <span class="n">interaction</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span> <span class="o">!=</span> <span class="n">select</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">pve_obj</span><span class="o">.</span><span class="n">player</span><span class="o">.</span><span class="n">id</span><span class="p">:</span>
+                    <span class="k">await</span> <span class="n">interaction</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">defer</span><span class="p">()</span>
+                    <span class="k">return</span>
+                
+                <span class="c1"># 戦闘開始処理を呼び出す</span>
+                <span class="k">await</span> <span class="n">select</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">pve_obj</span><span class="o">.</span><span class="n">start_battle</span><span class="p">(</span><span class="n">interaction</span><span class="p">,</span> <span class="n">select</span><span class="o">.</span><span class="n">values</span><span class="p">)</span></div>
+</div>
+
+        
+
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pve_obj</span><span class="p">,</span> <span class="n">party_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">game</span><span class="o">.</span><span class="n">Party</span><span class="p">],</span> <span class="o">*</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mi">180</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;ViewSelectPartyのコンストラクタ。</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                pve_obj (PvE): このViewが紐づくPvEセッションのインスタンス。</span>
+<span class="sd">                party_list (list[game.Party]): 選択肢となるプレイヤーのパーティーリスト。</span>
+<span class="sd">                timeout (float | None, optional): Viewがタイムアウトするまでの秒数。</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">pve_obj</span> <span class="o">=</span> <span class="n">pve_obj</span>
+
+            <span class="n">select</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SelectParty</span><span class="p">()</span>
+
+            <span class="c1"># プレイヤーが所持するパーティーを選択肢として追加</span>
+            <span class="k">for</span> <span class="n">party</span> <span class="ow">in</span> <span class="n">party_list</span><span class="p">:</span>
+                <span class="n">select</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">party</span><span class="o">.</span><span class="n">characters</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> 他</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">party</span><span class="o">.</span><span class="n">characters</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s1">人&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">party</span><span class="o">.</span><span class="n">uuid</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span><span class="n">select</span><span class="p">)</span></div>
+
+    
+    
+<div class="viewcode-block" id="PvE.ViewBattle">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.battle.PvE.ViewBattle">[ドキュメント]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">ViewBattle</span><span class="p">(</span><span class="n">discord</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">View</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;戦闘中の操作を受け付けるView。&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="PvE.ViewBattle.SelectTarget">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.battle.PvE.ViewBattle.SelectTarget">[ドキュメント]</a>
+        <span class="k">class</span><span class="w"> </span><span class="nc">SelectTarget</span><span class="p">(</span><span class="n">discord</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">Select</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;攻撃対象を選択するドロップダウンメニュー。&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="PvE.ViewBattle.SelectTarget.callback">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.battle.PvE.ViewBattle.SelectTarget.callback">[ドキュメント]</a>
+            <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">callback</span><span class="p">(</span><span class="n">select</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">Select</span><span class="p">,</span> <span class="n">interaction</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">Interaction</span><span class="p">):</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot;攻撃対象が選択された際のコールバック関数。</span>
+<span class="sd">                </span>
+<span class="sd">                操作者が戦闘中のプレイヤー本人であることを確認し、行動を処理します。</span>
+<span class="sd">                &quot;&quot;&quot;</span>
+                <span class="c1"># 操作者が戦闘開始者でなければ無視</span>
+                <span class="k">if</span> <span class="n">interaction</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span> <span class="o">!=</span> <span class="n">select</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">pve_obj</span><span class="o">.</span><span class="n">player</span><span class="o">.</span><span class="n">id</span><span class="p">:</span>
+                    <span class="k">await</span> <span class="n">interaction</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">defer</span><span class="p">()</span>
+                    <span class="k">return</span>
+
+                <span class="c1"># 行動処理を呼び出す</span>
+                <span class="k">await</span> <span class="n">select</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">pve_obj</span><span class="o">.</span><span class="n">act</span><span class="p">(</span><span class="n">interaction</span><span class="p">,</span> <span class="n">select</span><span class="o">.</span><span class="n">values</span><span class="p">)</span></div>
+</div>
+
+
+
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pve_obj</span><span class="p">,</span> <span class="n">enemy_party</span><span class="p">:</span> <span class="n">game</span><span class="o">.</span><span class="n">EnemyParty</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mi">180</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;ViewBattleのコンストラクタ。</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                pve_obj (PvE): このViewが紐づくPvEセッションのインスタンス。</span>
+<span class="sd">                enemy_party (game.EnemyParty): 敵パーティー。ターゲット選択肢として使用。</span>
+<span class="sd">                timeout (float | None, optional): Viewがタイムアウトするまでの秒数。</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">pve_obj</span> <span class="o">=</span> <span class="n">pve_obj</span>
+
+            <span class="n">select</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SelectTarget</span><span class="p">()</span>
+
+            <span class="c1"># 生存している敵をターゲットの選択肢として追加</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">enemy</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">enemy_party</span><span class="o">.</span><span class="n">characters</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">enemy</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
+                    <span class="n">select</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;[</span><span class="si">{</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s1">] </span><span class="si">{</span><span class="n">enemy</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> lv.</span><span class="si">{</span><span class="n">enemy</span><span class="o">.</span><span class="n">lv</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">enemy</span><span class="o">.</span><span class="n">uuid</span><span class="p">)</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span><span class="n">select</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="PvE.end">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.battle.PvE.end">[ドキュメント]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">end</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;戦闘終了時の処理。</span>
+<span class="sd">        </span>
+<span class="sd">        このメソッドは基底クラスでは具体的な実装を持たず、サブクラスでオーバーライドされることを</span>
+<span class="sd">        想定しています。報酬の計算や表示などがサブクラスで行われます。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># 戦闘が勝利で終わったか判定</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">battle</span><span class="o">.</span><span class="n">winner</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">player_party</span><span class="p">:</span>
+            <span class="n">embed</span> <span class="o">=</span> <span class="n">discord</span><span class="o">.</span><span class="n">Embed</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;勝利！&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;おめでとう！&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">discord</span><span class="o">.</span><span class="n">Colour</span><span class="o">.</span><span class="n">from_rgb</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">embed</span> <span class="o">=</span> <span class="n">discord</span><span class="o">.</span><span class="n">Embed</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;敗北&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;再挑戦しよう&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">discord</span><span class="o">.</span><span class="n">Colour</span><span class="o">.</span><span class="n">from_rgb</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        
+        <span class="c1"># メッセージを編集して結果を表示</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">interaction</span><span class="o">.</span><span class="n">edit_original_response</span><span class="p">(</span><span class="n">embed</span><span class="o">=</span><span class="n">embed</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+        <span class="c1"># プレイヤーを戦闘中リストから削除</span>
+        <span class="n">PvE</span><span class="o">.</span><span class="n">players_id</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">player</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="k">del</span> <span class="bp">self</span></div>
+
+
+
+<div class="viewcode-block" id="PvE.select_party">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.battle.PvE.select_party">[ドキュメント]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">select_party</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interaction</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">Interaction</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;プレイヤーに戦闘で使用するパーティーを選択させるUIを表示します。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            interaction (discord.Interaction): ユーザーとのインタラクション。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># プレイヤーが既に他の戦闘に参加している場合はエラーメッセージを返す</span>
+        <span class="k">if</span> <span class="n">interaction</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">id</span> <span class="ow">in</span> <span class="n">PvE</span><span class="o">.</span><span class="n">players_id</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">interaction</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="s2">&quot;あなたはすでに他の戦闘に参加しています&quot;</span><span class="p">,</span> <span class="n">ephemeral</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">return</span>
+        
+        <span class="c1"># プレイヤー情報をセッションに保存し、戦闘中リストに追加</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">player</span> <span class="o">=</span> <span class="n">interaction</span><span class="o">.</span><span class="n">user</span>
+        <span class="n">PvE</span><span class="o">.</span><span class="n">players_id</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">player</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interaction</span> <span class="o">=</span> <span class="n">interaction</span>
+        
+        <span class="c1"># プレイヤーのパーティーデータを読み込む</span>
+        <span class="n">party_list</span> <span class="o">=</span> <span class="n">game</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">get_player_parties</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">player</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        
+        <span class="c1"># パーティーが一つもなければエラーメッセージを返す</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">party_list</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">interaction</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="s2">&quot;パーティーがありません&quot;</span><span class="p">,</span> <span class="n">ephemeral</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="c1"># パーティー選択用のViewとEmbedを作成して送信</span>
+        <span class="n">view</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ViewSelectParty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">party_list</span><span class="p">)</span>
+        <span class="n">embed</span> <span class="o">=</span> <span class="n">discord</span><span class="o">.</span><span class="n">Embed</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;パーティーを選択してください&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;戦闘に使用するパーティーを選んでください&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">discord</span><span class="o">.</span><span class="n">Colour</span><span class="o">.</span><span class="n">from_rgb</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">255</span><span class="p">))</span>
+        <span class="k">await</span> <span class="n">interaction</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">embed</span><span class="o">=</span><span class="n">embed</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="n">view</span><span class="p">,</span> <span class="n">ephemeral</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="PvE.start_battle">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.battle.PvE.start_battle">[ドキュメント]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">start_battle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interaction</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">Interaction</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;選択されたパーティーで戦闘を開始し、最初の戦闘画面を表示します。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            interaction (discord.Interaction): ユーザーとのインタラクション。</span>
+<span class="sd">            values (list[str]): 選択されたパーティーのUUIDを含むリスト。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># 選択されたパーティーを取得</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">player_party</span> <span class="o">=</span> <span class="n">game</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">get_player_party</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">player</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="c1"># Battleインスタンスを生成して戦闘を開始</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">battle</span> <span class="o">=</span> <span class="n">game</span><span class="o">.</span><span class="n">Battle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">player_party</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">enemy_party</span><span class="p">)</span>
+        
+        <span class="c1"># 元のメッセージ（「敵がスポーンした！」）を更新して戦闘画面を表示</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">show_battle_screen</span><span class="p">(</span><span class="n">interaction</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="PvE.show_battle_screen">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.battle.PvE.show_battle_screen">[ドキュメント]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">show_battle_screen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interaction</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">Interaction</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;現在の戦闘状況をEmbedとして表示します。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            interaction (discord.Interaction): ユーザーとのインタラクション。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># 戦闘が終了しているかチェック</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">battle</span><span class="o">.</span><span class="n">is_settled</span><span class="p">:</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+            <span class="k">return</span>
+        
+        <span class="c1"># 戦闘画面のEmbedを作成</span>
+        <span class="n">embed</span> <span class="o">=</span> <span class="n">discord</span><span class="o">.</span><span class="n">Embed</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;戦闘中！&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">discord</span><span class="o">.</span><span class="n">Colour</span><span class="o">.</span><span class="n">from_rgb</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span><span class="mi">255</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+
+        <span class="c1"># 味方パーティの情報をフィールドに追加</span>
+        <span class="n">player_party_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">chara</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">player_party</span><span class="o">.</span><span class="n">characters</span><span class="p">):</span>
+            <span class="n">player_party_str</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;**[</span><span class="si">{</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s1">] </span><span class="si">{</span><span class="n">chara</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">** </span><span class="si">{</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">chara</span><span class="o">.</span><span class="n">hp</span><span class="p">)</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">chara</span><span class="o">.</span><span class="n">get_effective_status</span><span class="p">(</span><span class="n">game</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">HP</span><span class="p">))</span><span class="si">}</span><span class="se">\\</span><span class="s1">n&#39;</span>
+        <span class="n">embed</span><span class="o">.</span><span class="n">add_field</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;[味方パーティー]&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">player_party_str</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">n&quot;</span><span class="p">),</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># 敵パーティの情報をフィールドに追加</span>
+        <span class="n">enemy_party_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">chara</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">enemy_party</span><span class="o">.</span><span class="n">characters</span><span class="p">):</span>
+            <span class="n">enemy_party_str</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;**[</span><span class="si">{</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s1">] </span><span class="si">{</span><span class="n">chara</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">** </span><span class="si">{</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">chara</span><span class="o">.</span><span class="n">hp</span><span class="p">)</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">chara</span><span class="o">.</span><span class="n">get_effective_status</span><span class="p">(</span><span class="n">game</span><span class="o">.</span><span class="n">Status</span><span class="o">.</span><span class="n">HP</span><span class="p">))</span><span class="si">}</span><span class="se">\\</span><span class="s1">n&#39;</span>
+        <span class="n">embed</span><span class="o">.</span><span class="n">add_field</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;[敵パーティー]&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">enemy_party_str</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">n&quot;</span><span class="p">),</span> <span class="n">inline</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        
+        <span class="c1"># 行動ログをフッターに表示</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;log&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">:</span>
+             <span class="n">embed</span><span class="o">.</span><span class="n">set_footer</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;[ログ]</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">))</span>
+        
+        <span class="c1"># 行動順と現在の行動キャラクターを表示</span>
+        <span class="n">order_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">active_chara_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">battle</span><span class="o">.</span><span class="n">get_active_character</span><span class="p">()</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">for</span> <span class="n">chara</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">battle</span><span class="o">.</span><span class="n">order</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">chara</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">active_chara_name</span><span class="p">:</span>
+                <span class="n">order_str</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;**&gt;&gt; </span><span class="si">{</span><span class="n">chara</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">**</span><span class="se">\\</span><span class="s1">n&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">order_str</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">chara</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="se">\\</span><span class="s1">n&#39;</span>
+        <span class="n">embed</span><span class="o">.</span><span class="n">add_field</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;[行動順]&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">order_str</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">n&quot;</span><span class="p">))</span>
+
+        <span class="c1"># 戦闘操作用のViewを作成</span>
+        <span class="n">view</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ViewBattle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">enemy_party</span><span class="p">)</span>
+
+        <span class="c1"># ephemeralでない場合は元のメッセージを編集、ephemeralの場合は新しいメッセージを送信</span>
+        <span class="k">if</span> <span class="n">interaction</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">flags</span><span class="o">.</span><span class="n">ephemeral</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">interaction</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">edit_message</span><span class="p">(</span><span class="n">embed</span><span class="o">=</span><span class="n">embed</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="n">view</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">interaction</span><span class="o">.</span><span class="n">edit_original_response</span><span class="p">(</span><span class="n">embed</span><span class="o">=</span><span class="n">embed</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="n">view</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="PvE.act">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.battle.PvE.act">[ドキュメント]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">act</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interaction</span><span class="p">:</span> <span class="n">discord</span><span class="o">.</span><span class="n">Interaction</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;プレイヤーの行動を処理し、戦闘を1ターン進めます。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            interaction (discord.Interaction): ユーザーとのインタラクション。</span>
+<span class="sd">            values (list[str]): 選択されたターゲットのUUIDを含むリスト。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># ターゲットUUIDからターゲットキャラクターオブジェクトを取得</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">enemy_party</span><span class="o">.</span><span class="n">characters</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">uuid</span> <span class="o">==</span> <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># battleオブジェクトに行動を処理させる</span>
+        <span class="n">action_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">battle</span><span class="o">.</span><span class="n">act</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+
+        <span class="c1"># 行動ログを生成</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">log_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">action_data</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> は </span><span class="si">{</span><span class="n">action_data</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> に </span><span class="si">{</span><span class="n">action_data</span><span class="o">.</span><span class="n">action_type</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> をした！&#39;</span>
+        <span class="k">if</span> <span class="n">action_data</span><span class="o">.</span><span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">log_str</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39; **</span><span class="si">{</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">action_data</span><span class="o">.</span><span class="n">value</span><span class="p">)</span><span class="si">}</span><span class="s1">** のダメージ！&#39;</span> <span class="k">if</span> <span class="n">action_data</span><span class="o">.</span><span class="n">action_type</span> <span class="o">==</span> <span class="n">game</span><span class="o">.</span><span class="n">ActionType</span><span class="o">.</span><span class="n">ATTACK</span> <span class="k">else</span> <span class="sa">f</span><span class="s1">&#39; **</span><span class="si">{</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">action_data</span><span class="o">.</span><span class="n">value</span><span class="p">)</span><span class="si">}</span><span class="s1">** 回復！&#39;</span>
+        <span class="k">if</span> <span class="n">action_data</span><span class="o">.</span><span class="n">is_crit</span><span class="p">:</span>
+            <span class="n">log_str</span> <span class="o">+=</span> <span class="s1">&#39; **CRITICAL!!**&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">log_str</span><span class="p">)</span>
+        
+        <span class="c1"># スキルが発動した場合、そのログも追加</span>
+        <span class="k">for</span> <span class="n">skill</span> <span class="ow">in</span> <span class="n">action_data</span><span class="o">.</span><span class="n">list_skill</span><span class="p">:</span>
+             <span class="n">skill_log</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;  &gt;&gt; Skill[</span><span class="si">{</span><span class="n">skill</span><span class="o">.</span><span class="n">skill_type</span><span class="o">.</span><span class="n">name_ja</span><span class="si">}</span><span class="s1">]が発動！&#39;</span>
+             <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">skill_log</span><span class="p">)</span>
+
+        <span class="c1"># 次の戦闘画面を表示</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">show_battle_screen</span><span class="p">(</span><span class="n">interaction</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="BattleCmd">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.battle.BattleCmd">[ドキュメント]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BattleCmd</span><span class="p">(</span><span class="n">commands</span><span class="o">.</span><span class="n">Cog</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;戦闘関連のコマンドとバックグラウンドタスクを定義するCog。&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bot</span><span class="p">:</span> <span class="n">commands</span><span class="o">.</span><span class="n">Bot</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Cogを初期化し、敵を定期的にスポーンさせるタスクを開始します。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            bot (commands.Bot): Botのインスタンス。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bot</span> <span class="o">=</span> <span class="n">bot</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spawn_enemy</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+
+    <span class="nd">@tasks</span><span class="o">.</span><span class="n">loop</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">spawn_enemy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;30分ごとに実行されるタスク。</span>
+<span class="sd">        </span>
+<span class="sd">        設定されたワールドチャンネルにランダムな敵パーティーを生成し、</span>
+<span class="sd">        `ViewEnemySpawn`と共にメッセージを送信します。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># ワールドチャンネルIDを取得</span>
+        <span class="n">world_id</span> <span class="o">=</span> <span class="mi">992425654992339014</span>
+        <span class="n">channel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bot</span><span class="o">.</span><span class="n">get_channel</span><span class="p">(</span><span class="n">world_id</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">channel</span><span class="p">:</span>
+            <span class="c1"># 現在チャンネルにいるメンバーのレベル帯を取得</span>
+            <span class="n">lv_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">game</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">get_player_level</span><span class="p">(</span><span class="n">member</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="n">channel</span><span class="o">.</span><span class="n">members</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">member</span><span class="o">.</span><span class="n">bot</span><span class="p">]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">lv_list</span><span class="p">:</span>
+                <span class="n">lv_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            
+            <span class="n">min_lv</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">lv_list</span><span class="p">)</span> <span class="o">-</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">max_lv</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">lv_list</span><span class="p">)</span>
+            
+            <span class="c1"># 敵データを読み込み、レベル帯に応じた敵を生成</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">sys</span><span class="o">.</span><span class="n">get_game_path</span><span class="p">(</span><span class="s2">&quot;asset/data/character.json&quot;</span><span class="p">),</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">character_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+            <span class="n">min_count</span><span class="p">,</span> <span class="n">max_count</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span>
+            <span class="c1"># プレイヤーの最大レベルに応じて敵の数を調整</span>
+            <span class="k">if</span> <span class="n">max_lv</span> <span class="o">&gt;=</span> <span class="mi">51</span><span class="p">:</span> <span class="n">min_count</span><span class="p">,</span> <span class="n">max_count</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span>
+            <span class="k">elif</span> <span class="n">max_lv</span> <span class="o">&gt;=</span> <span class="mi">41</span><span class="p">:</span> <span class="n">max_count</span> <span class="o">=</span> <span class="mi">5</span>
+            <span class="k">elif</span> <span class="n">max_lv</span> <span class="o">&gt;=</span> <span class="mi">21</span><span class="p">:</span> <span class="n">min_count</span> <span class="o">=</span> <span class="mi">3</span>
+            <span class="k">elif</span> <span class="n">max_lv</span> <span class="o">&gt;=</span> <span class="mi">11</span><span class="p">:</span> <span class="n">min_count</span> <span class="o">=</span> <span class="mi">2</span>
+            <span class="k">elif</span> <span class="n">max_lv</span> <span class="o">&gt;=</span> <span class="mi">6</span><span class="p">:</span> <span class="n">max_count</span> <span class="o">=</span> <span class="mi">4</span>
+
+            <span class="n">enemies_info</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choices</span><span class="p">(</span><span class="n">character_data</span><span class="p">[</span><span class="s2">&quot;enemy&quot;</span><span class="p">],</span> <span class="n">weights</span><span class="o">=</span><span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">character_data</span><span class="p">[</span><span class="s2">&quot;enemy&quot;</span><span class="p">]],</span> <span class="n">k</span><span class="o">=</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">min_count</span><span class="p">,</span> <span class="n">max_count</span><span class="p">))</span>
+            
+            <span class="n">enemies_object</span> <span class="o">=</span> <span class="p">[</span><span class="n">game</span><span class="o">.</span><span class="n">EnemyCharacter</span><span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">min_lv</span><span class="p">,</span> <span class="n">max_lv</span><span class="p">))</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">enemies_info</span><span class="p">]</span>
+            <span class="n">enemy_party</span> <span class="o">=</span> <span class="n">game</span><span class="o">.</span><span class="n">EnemyParty</span><span class="p">(</span><span class="n">enemies_object</span><span class="p">)</span>
+
+            <span class="c1"># EmbedとViewを作成してメッセージを送信</span>
+            <span class="n">embed_description</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">n&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s1">&#39;**</span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">** lv.</span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">lv</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">enemy_party</span><span class="o">.</span><span class="n">characters</span><span class="p">])</span>
+            <span class="n">pve_obj</span> <span class="o">=</span> <span class="n">PvE</span><span class="p">()</span>
+            <span class="n">pve_obj</span><span class="o">.</span><span class="n">enemy_party</span> <span class="o">=</span> <span class="n">enemy_party</span>
+            <span class="n">view</span> <span class="o">=</span> <span class="n">ViewEnemySpawn</span><span class="p">(</span><span class="n">pve_obj</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">1800</span><span class="p">)</span>
+            <span class="n">embed</span> <span class="o">=</span> <span class="n">discord</span><span class="o">.</span><span class="n">Embed</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;モンスターがスポーンした！&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">embed_description</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">discord</span><span class="o">.</span><span class="n">Colour</span><span class="o">.</span><span class="n">from_rgb</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">255</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+            <span class="k">await</span> <span class="n">channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">embed</span><span class="o">=</span><span class="n">embed</span><span class="p">,</span> <span class="n">view</span><span class="o">=</span><span class="n">view</span><span class="p">,</span> <span class="n">silent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="setup">
+<a class="viewcode-back" href="../../../src.cog.html#src.cog.battle.setup">[ドキュメント]</a>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">setup</span><span class="p">(</span><span class="n">bot</span><span class="p">:</span> <span class="n">commands</span><span class="o">.</span><span class="n">Bot</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;CogをBotに登録するためのセットアップ関数。&quot;&quot;&quot;</span>
+    <span class="k">await</span> <span class="n">bot</span><span class="o">.</span><span class="n">add_cog</span><span class="p">(</span><span class="n">BattleCmd</span><span class="p">(</span><span class="n">bot</span><span class="p">))</span></div>
+
+    
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, qr0.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
